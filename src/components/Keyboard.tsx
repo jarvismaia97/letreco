@@ -1,0 +1,78 @@
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
+import { COLORS } from '../theme';
+import type { LetterState } from '../hooks/useGame';
+
+const ROWS = [
+  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç'],
+  ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
+];
+
+interface Props {
+  onKeyPress: (key: string) => void;
+  keyColors: Record<string, LetterState>;
+}
+
+function getKeyBg(state?: LetterState): string {
+  switch (state) {
+    case 'correct': return COLORS.correct;
+    case 'present': return COLORS.present;
+    case 'absent': return COLORS.absent;
+    default: return COLORS.keyBg;
+  }
+}
+
+export default function Keyboard({ onKeyPress, keyColors }: Props) {
+  const { width } = useWindowDimensions();
+  const keyWidth = Math.min(Math.floor((width - 30) / 10), 43);
+  const keyHeight = 58;
+
+  return (
+    <View style={styles.container}>
+      {ROWS.map((row, i) => (
+        <View key={i} style={styles.row}>
+          {row.map((key) => {
+            const isSpecial = key === 'ENTER' || key === '⌫';
+            const displayKey = key === '⌫' ? '⌫' : key === 'ENTER' ? 'ENTER' : key;
+            const bg = isSpecial ? COLORS.keyBg : getKeyBg(keyColors[key]);
+            const w = isSpecial ? keyWidth * 1.5 : keyWidth;
+
+            return (
+              <TouchableOpacity
+                key={key}
+                style={[styles.key, { width: w, height: keyHeight, backgroundColor: bg }]}
+                onPress={() => onKeyPress(key === '⌫' ? 'BACKSPACE' : key)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.keyText, isSpecial && { fontSize: 12 }]}>{displayKey}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    paddingBottom: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    marginVertical: 3,
+  },
+  key: {
+    marginHorizontal: 2.5,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  keyText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+});
