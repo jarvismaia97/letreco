@@ -10,10 +10,8 @@ import HelpModal from './src/components/HelpModal';
 import { useGame } from './src/hooks/useGame';
 import { COLORS } from './src/theme';
 
-export default function App() {
-  const [mode, setMode] = useState(5);
+function GameScreen({ mode, onModeChange }: { mode: number; onModeChange: (m: number) => void }) {
   const [showHelp, setShowHelp] = useState(false);
-
   const game = useGame(mode);
 
   // Physical keyboard support (web)
@@ -38,7 +36,7 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <Header onHelp={() => setShowHelp(true)} onStats={() => game.setShowStats(true)} />
-      <ModeSelector mode={mode} onSelect={setMode} />
+      <ModeSelector mode={mode} onSelect={onModeChange} />
       <View style={styles.boardContainer}>
         <Board
           board={game.board}
@@ -63,6 +61,13 @@ export default function App() {
       <HelpModal visible={showHelp} onClose={() => setShowHelp(false)} />
     </View>
   );
+}
+
+export default function App() {
+  const [mode, setMode] = useState(5);
+
+  // key={mode} forces full remount when switching modes
+  return <GameScreen key={mode} mode={mode} onModeChange={setMode} />;
 }
 
 const styles = StyleSheet.create({
