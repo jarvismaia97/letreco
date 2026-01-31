@@ -24,7 +24,7 @@ function getKeyBg(state?: LetterState): string {
 }
 
 export default function Keyboard({ onKeyPress, keyColors }: Props) {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const keyWidth = Math.min(Math.floor((width - 30) / 10), 40);
   const keyHeight = Math.min(52, Math.floor(height * 0.065));
 
