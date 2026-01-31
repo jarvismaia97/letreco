@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions, Platform } from 'react-native';
 import { COLORS } from '../theme';
 import type { LetterState } from '../hooks/useGame';
 
@@ -25,8 +25,8 @@ function getKeyBg(state?: LetterState): string {
 
 export default function Keyboard({ onKeyPress, keyColors }: Props) {
   const { width } = useWindowDimensions();
-  const keyWidth = Math.min(Math.floor((width - 30) / 10), 43);
-  const keyHeight = 58;
+  const keyWidth = Math.min(Math.floor((width - 30) / 10), 40);
+  const keyHeight = Math.min(52, Math.floor(height * 0.065));
 
   return (
     <View style={styles.container}>
@@ -58,7 +58,7 @@ export default function Keyboard({ onKeyPress, keyColors }: Props) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingBottom: 10,
+    paddingBottom: Platform.OS === 'web' ? 10 : 5,
   },
   row: {
     flexDirection: 'row',

@@ -12,12 +12,6 @@ export const COLORS = {
   modalBg: '#1a1a1b',
 };
 
-export const TILE_SIZES: Record<number, number> = {
-  4: 72,
-  5: 62,
-  6: 52,
-  7: 46,
-};
-
+// Tile sizes are now calculated dynamically in Board.tsx based on screen dimensions
 export const TILE_GAP = 5;
 export const MAX_ATTEMPTS = 6;

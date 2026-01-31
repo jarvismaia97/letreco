@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import Tile from './Tile';
-import { TILE_SIZES } from '../theme';
+import { TILE_GAP, MAX_ATTEMPTS } from '../theme';
 import type { TileData } from '../hooks/useGame';
 
 interface Props {
@@ -14,7 +14,16 @@ interface Props {
 }
 
 export default function Board({ board, mode, revealingRow, currentRowIndex, cursorPosition, onTilePress }: Props) {
-  const tileSize = TILE_SIZES[mode] || 62;
+  const { width, height } = useWindowDimensions();
+
+  // Calculate tile size based on available space
+  // Reserve: header ~50, mode selector ~50, keyboard ~210, padding ~40
+  const availableHeight = height - 350;
+  const availableWidth = width - 20;
+
+  const maxTileFromWidth = Math.floor((availableWidth - (mode - 1) * TILE_GAP) / mode);
+  const maxTileFromHeight = Math.floor((availableHeight - (MAX_ATTEMPTS - 1) * TILE_GAP) / MAX_ATTEMPTS);
+  const tileSize = Math.min(maxTileFromWidth, maxTileFromHeight, 68);
 
   return (
     <View style={styles.container}>
@@ -41,7 +50,7 @@ export default function Board({ board, mode, revealingRow, currentRowIndex, curs
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   row: {
     flexDirection: 'row',

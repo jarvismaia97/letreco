@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, StatusBar, Platform } from 'react-native';
+import { View, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
 import Header from './src/components/Header';
 import ModeSelector from './src/components/ModeSelector';
 import Board from './src/components/Board';
@@ -33,7 +33,7 @@ function GameScreen({ mode, onModeChange }: { mode: number; onModeChange: (m: nu
   if (!game.loaded) return <View style={styles.container} />;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <Header onHelp={() => setShowHelp(true)} onStats={() => game.setShowStats(true)} />
       <ModeSelector mode={mode} onSelect={onModeChange} />
@@ -59,7 +59,7 @@ function GameScreen({ mode, onModeChange }: { mode: number; onModeChange: (m: nu
         shareText={game.shareResult()}
       />
       <HelpModal visible={showHelp} onClose={() => setShowHelp(false)} />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -78,5 +78,6 @@ const styles = StyleSheet.create({
   boardContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
