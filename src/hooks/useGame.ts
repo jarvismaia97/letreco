@@ -66,7 +66,7 @@ export function useGame(mode: number) {
   const dayNumber = getDayNumber();
 
   const [guesses, setGuesses] = useState<TileData[][]>([]);
-  const [currentInput, setCurrentInput] = useState('');
+  const [currentInput, setCurrentInput] = useState<string[]>([]);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
@@ -75,6 +75,18 @@ export function useGame(mode: number) {
   const [revealingRow, setRevealingRow] = useState(-1);
   const [showStats, setShowStats] = useState(false);
   const [loaded, setLoaded] = useState(false);
+
+  // Reset state when mode changes
+  useEffect(() => {
+    setGuesses([]);
+    setCurrentInput([]);
+    setCursorPosition(0);
+    setGameOver(false);
+    setWon(false);
+    setRevealingRow(-1);
+    setShowStats(false);
+    setLoaded(false);
+  }, [mode]);
 
   // Load saved state
   useEffect(() => {
@@ -118,18 +130,22 @@ export function useGame(mode: number) {
 
   const onKeyPress = useCallback((key: string) => {
     if (gameOver) return;
+
     if (key === 'ENTER') {
-      if (currentInput.length !== mode) {
+      // Check all slots are filled
+      const filled = currentInput.filter(c => c !== '');
+      if (filled.length !== mode) {
         showToast(`A palavra deve ter ${mode} letras`);
         return;
       }
-      const normalized = normalize(currentInput);
+      const word = currentInput.join('');
+      const normalized = normalize(word);
       if (!validWords.has(normalized)) {
         showToast('Palavra não encontrada');
         return;
       }
-      const states = evaluateGuess(currentInput, dailyWord);
-      const row: TileData[] = currentInput.split('').map((letter, i) => ({
+      const states = evaluateGuess(word, dailyWord);
+      const row: TileData[] = currentInput.map((letter, i) => ({
         letter: letter.toUpperCase(),
         state: states[i],
       }));
@@ -143,14 +159,13 @@ export function useGame(mode: number) {
       const over = isWin || isLoss;
 
       setGuesses(newGuesses);
-      setCurrentInput('');
+      setCurrentInput([]);
       setCursorPosition(0);
 
       if (over) {
         setTimeout(() => {
           setGameOver(true);
           setWon(isWin);
-          // Update stats
           const newStats = { ...stats, played: stats.played + 1 };
           if (isWin) {
             newStats.wins = stats.wins + 1;
@@ -169,44 +184,53 @@ export function useGame(mode: number) {
 
       saveState(newGuesses, over, isWin);
     } else if (key === 'BACKSPACE') {
-      // If cursor is on a filled tile, remove that letter
-      // If cursor is on empty tile, move back and remove previous letter
       setCurrentInput((prev) => {
-        const chars = prev.split('');
-        if (cursorPosition < chars.length && chars[cursorPosition]) {
-          chars.splice(cursorPosition, 1);
-          // Don't move cursor back, it now points to the next char (or empty)
-          return chars.join('');
+        const chars = [...prev];
+        // Ensure array is right size
+        while (chars.length < mode) chars.push('');
+
+        if (chars[cursorPosition] && chars[cursorPosition] !== '') {
+          // Clear letter at cursor position
+          chars[cursorPosition] = '';
+          return chars;
         } else if (cursorPosition > 0) {
+          // Move back to previous position and clear it
           const newPos = cursorPosition - 1;
-          chars.splice(newPos, 1);
+          chars[newPos] = '';
           setCursorPosition(newPos);
-          return chars.join('');
+          return chars;
         }
         return prev;
       });
-    } else if (currentInput.length < mode || cursorPosition < currentInput.length) {
+    } else {
+      // Letter key
       setCurrentInput((prev) => {
-        const chars = prev.split('');
-        if (cursorPosition < chars.length) {
-          // Replace existing letter at cursor
-          chars[cursorPosition] = key.toUpperCase();
-        } else {
-          // Pad with spaces if needed and insert
-          while (chars.length < cursorPosition) chars.push('');
-          chars[cursorPosition] = key.toUpperCase();
-        }
-        const result = chars.join('');
+        const chars = [...prev];
+        // Ensure array is right size
+        while (chars.length < mode) chars.push('');
+
+        // Place letter at cursor position
+        chars[cursorPosition] = key.toUpperCase();
+
         // Advance cursor to next empty spot
         let nextPos = cursorPosition + 1;
-        while (nextPos < mode && chars[nextPos]) {
+        while (nextPos < mode && chars[nextPos] && chars[nextPos] !== '') {
           nextPos++;
         }
+        if (nextPos >= mode) {
+          // If no empty spot after, find first empty from start
+          for (let i = 0; i < mode; i++) {
+            if (!chars[i] || chars[i] === '') {
+              nextPos = i;
+              break;
+            }
+          }
+        }
         setCursorPosition(Math.min(nextPos, mode - 1));
-        return result.slice(0, mode);
+        return chars;
       });
     }
-  }, [gameOver, currentInput, mode, validWords, dailyWord, guesses, stats, saveState, saveStats, showToast]);
+  }, [gameOver, currentInput, cursorPosition, mode, validWords, dailyWord, guesses, stats, saveState, saveStats, showToast]);
 
   // Keyboard colors
   const keyboardColors = useCallback((): Record<string, LetterState> => {
@@ -250,9 +274,10 @@ export function useGame(mode: number) {
       // Current input row
       const row: TileData[] = [];
       for (let j = 0; j < mode; j++) {
+        const ch = currentInput[j] || '';
         row.push({
-          letter: currentInput[j]?.toUpperCase() || '',
-          state: currentInput[j] ? 'tbd' : 'empty',
+          letter: ch.toUpperCase(),
+          state: ch ? 'tbd' : 'empty',
         });
       }
       board.push(row);
