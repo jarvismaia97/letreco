@@ -40,7 +40,14 @@ export default function App() {
       <Header onHelp={() => setShowHelp(true)} onStats={() => game.setShowStats(true)} />
       <ModeSelector mode={mode} onSelect={setMode} />
       <View style={styles.boardContainer}>
-        <Board board={game.board} mode={mode} revealingRow={game.revealingRow} />
+        <Board
+          board={game.board}
+          mode={mode}
+          revealingRow={game.revealingRow}
+          currentRowIndex={game.currentRowIndex}
+          cursorPosition={game.cursorPosition}
+          onTilePress={(col) => game.setCursorPosition(col)}
+        />
       </View>
       <Toast message={game.toastMessage} />
       <Keyboard onKeyPress={game.onKeyPress} keyColors={game.keyboardColors()} />

@@ -67,6 +67,7 @@ export function useGame(mode: number) {
 
   const [guesses, setGuesses] = useState<TileData[][]>([]);
   const [currentInput, setCurrentInput] = useState('');
+  const [cursorPosition, setCursorPosition] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -143,6 +144,7 @@ export function useGame(mode: number) {
 
       setGuesses(newGuesses);
       setCurrentInput('');
+      setCursorPosition(0);
 
       if (over) {
         setTimeout(() => {
@@ -167,9 +169,42 @@ export function useGame(mode: number) {
 
       saveState(newGuesses, over, isWin);
     } else if (key === 'BACKSPACE') {
-      setCurrentInput((prev) => prev.slice(0, -1));
-    } else if (currentInput.length < mode) {
-      setCurrentInput((prev) => prev + key.toUpperCase());
+      // If cursor is on a filled tile, remove that letter
+      // If cursor is on empty tile, move back and remove previous letter
+      setCurrentInput((prev) => {
+        const chars = prev.split('');
+        if (cursorPosition < chars.length && chars[cursorPosition]) {
+          chars.splice(cursorPosition, 1);
+          // Don't move cursor back, it now points to the next char (or empty)
+          return chars.join('');
+        } else if (cursorPosition > 0) {
+          const newPos = cursorPosition - 1;
+          chars.splice(newPos, 1);
+          setCursorPosition(newPos);
+          return chars.join('');
+        }
+        return prev;
+      });
+    } else if (currentInput.length < mode || cursorPosition < currentInput.length) {
+      setCurrentInput((prev) => {
+        const chars = prev.split('');
+        if (cursorPosition < chars.length) {
+          // Replace existing letter at cursor
+          chars[cursorPosition] = key.toUpperCase();
+        } else {
+          // Pad with spaces if needed and insert
+          while (chars.length < cursorPosition) chars.push('');
+          chars[cursorPosition] = key.toUpperCase();
+        }
+        const result = chars.join('');
+        // Advance cursor to next empty spot
+        let nextPos = cursorPosition + 1;
+        while (nextPos < mode && chars[nextPos]) {
+          nextPos++;
+        }
+        setCursorPosition(Math.min(nextPos, mode - 1));
+        return result.slice(0, mode);
+      });
     }
   }, [gameOver, currentInput, mode, validWords, dailyWord, guesses, stats, saveState, saveStats, showToast]);
 
@@ -229,6 +264,9 @@ export function useGame(mode: number) {
   return {
     board,
     guesses,
+    currentRowIndex: guesses.length,
+    cursorPosition,
+    setCursorPosition,
     gameOver,
     won,
     dailyWord,

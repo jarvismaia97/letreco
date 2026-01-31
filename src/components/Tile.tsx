@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text } from 'react-native';
-import { COLORS, TILE_SIZES, TILE_GAP } from '../theme';
+import { Animated, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { COLORS, TILE_GAP } from '../theme';
 import type { LetterState } from '../hooks/useGame';
 
 interface Props {
@@ -9,9 +9,11 @@ interface Props {
   size: number;
   delay?: number;
   revealing?: boolean;
+  isCursor?: boolean;
+  onPress?: () => void;
 }
 
-export default function Tile({ letter, state, size, delay = 0, revealing }: Props) {
+export default function Tile({ letter, state, size, delay = 0, revealing, isCursor, onPress }: Props) {
   const flipAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const prevState = useRef(state);
@@ -29,7 +31,6 @@ export default function Tile({ letter, state, size, delay = 0, revealing }: Prop
     }
   }, [revealing, state, delay]);
 
-  // Pop animation on letter input
   useEffect(() => {
     if (letter && state === 'tbd' && prevState.current === 'empty') {
       Animated.sequence([
@@ -49,7 +50,15 @@ export default function Tile({ letter, state, size, delay = 0, revealing }: Prop
     }
   };
 
-  const borderColor = state === 'tbd' ? COLORS.lightGray : state === 'empty' ? COLORS.emptyBorder : 'transparent';
+  const borderColor = isCursor
+    ? '#ffffff'
+    : state === 'tbd'
+      ? COLORS.lightGray
+      : state === 'empty'
+        ? COLORS.emptyBorder
+        : 'transparent';
+
+  const borderWidth = (state === 'empty' || state === 'tbd') ? 2 : 0;
 
   const frontInterpolate = flipAnim.interpolate({
     inputRange: [0, 0.5, 1],
@@ -62,29 +71,50 @@ export default function Tile({ letter, state, size, delay = 0, revealing }: Prop
 
   const isRevealed = !revealing || state === 'empty' || state === 'tbd';
 
+  const cursorShadow = isCursor ? {
+    shadowColor: '#ffffff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 8,
+  } : {};
+
+  const tileContent = (
+    <Text style={[styles.letter, { fontSize: size * 0.5 }]}>{letter}</Text>
+  );
+
   if (isRevealed) {
-    return (
+    const inner = (
       <Animated.View
         style={[
           styles.tile,
+          cursorShadow,
           {
             width: size,
             height: size,
             backgroundColor: bgColor(),
             borderColor,
-            borderWidth: state === 'empty' || state === 'tbd' ? 2 : 0,
+            borderWidth: isCursor ? 2.5 : borderWidth,
             transform: [{ scale: scaleAnim }],
           },
         ]}
       >
-        <Text style={[styles.letter, { fontSize: size * 0.5 }]}>{letter}</Text>
+        {tileContent}
       </Animated.View>
     );
+
+    if (onPress) {
+      return (
+        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+          {inner}
+        </TouchableOpacity>
+      );
+    }
+    return inner;
   }
 
   return (
     <Animated.View style={{ width: size, height: size }}>
-      {/* Front (before flip) */}
       <Animated.View
         style={[
           styles.tile,
@@ -98,9 +128,8 @@ export default function Tile({ letter, state, size, delay = 0, revealing }: Prop
           },
         ]}
       >
-        <Text style={[styles.letter, { fontSize: size * 0.5 }]}>{letter}</Text>
+        {tileContent}
       </Animated.View>
-      {/* Back (after flip) */}
       <Animated.View
         style={[
           styles.tile,
@@ -113,7 +142,7 @@ export default function Tile({ letter, state, size, delay = 0, revealing }: Prop
           },
         ]}
       >
-        <Text style={[styles.letter, { fontSize: size * 0.5 }]}>{letter}</Text>
+        {tileContent}
       </Animated.View>
     </Animated.View>
   );

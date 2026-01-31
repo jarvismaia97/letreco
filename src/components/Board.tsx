@@ -8,9 +8,12 @@ interface Props {
   board: TileData[][];
   mode: number;
   revealingRow: number;
+  currentRowIndex: number;
+  cursorPosition: number;
+  onTilePress: (col: number) => void;
 }
 
-export default function Board({ board, mode, revealingRow }: Props) {
+export default function Board({ board, mode, revealingRow, currentRowIndex, cursorPosition, onTilePress }: Props) {
   const tileSize = TILE_SIZES[mode] || 62;
 
   return (
@@ -25,6 +28,8 @@ export default function Board({ board, mode, revealingRow }: Props) {
               size={tileSize}
               delay={colIdx * 250}
               revealing={rowIdx === revealingRow}
+              isCursor={rowIdx === currentRowIndex && colIdx === cursorPosition}
+              onPress={rowIdx === currentRowIndex ? () => onTilePress(colIdx) : undefined}
             />
           ))}
         </View>
