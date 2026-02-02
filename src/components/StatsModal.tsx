@@ -1,7 +1,8 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Share, Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { COLORS, MAX_ATTEMPTS } from '../theme';
+import { MAX_ATTEMPTS } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 import type { GameStats, GameMode } from '../hooks/useGame';
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export default function StatsModal({ visible, onClose, stats, gameOver, won, answer, shareText, gameMode }: Props) {
+  const { theme } = useTheme();
   const winPct = stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0;
   const maxDist = Math.max(...stats.distribution, 1);
 
@@ -34,17 +36,17 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
+      <View style={[styles.overlay, { backgroundColor: theme.colors.modalOverlay }]}>
+        <View style={[styles.modal, { backgroundColor: theme.colors.modalBg }]}>
           <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <Text style={styles.closeTxt}>✕</Text>
+            <Text style={[styles.closeTxt, { color: theme.colors.text }]}>✕</Text>
           </TouchableOpacity>
 
           {gameOver && !won && (
-            <Text style={styles.answer}>A palavra era: {answer}</Text>
+            <Text style={[styles.answer, { color: theme.colors.present }]}>A palavra era: {answer}</Text>
           )}
 
-          <Text style={styles.heading}>ESTATÍSTICAS</Text>
+          <Text style={[styles.heading, { color: theme.colors.text }]}>ESTATÍSTICAS</Text>
           <View style={styles.statsRow}>
             {[
               { val: stats.played, label: 'Jogos' },
@@ -53,35 +55,35 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
               { val: stats.maxStreak, label: 'Melhor Seq.', emoji: '🔥' },
             ].map((s, i) => (
               <View key={i} style={styles.statItem}>
-                <Text style={styles.statVal}>
+                <Text style={[styles.statVal, { color: theme.colors.text }]}>
                   {s.emoji && s.val > 0 ? `${s.emoji} ` : ''}{s.val}
                 </Text>
-                <Text style={styles.statLabel}>{s.label}</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.lightGray }]}>{s.label}</Text>
               </View>
             ))}
           </View>
 
-          <Text style={styles.heading}>DISTRIBUIÇÃO</Text>
+          <Text style={[styles.heading, { color: theme.colors.text }]}>DISTRIBUIÇÃO</Text>
           {stats.distribution.map((count, i) => (
             <View key={i} style={styles.distRow}>
-              <Text style={styles.distLabel}>{i + 1}</Text>
+              <Text style={[styles.distLabel, { color: theme.colors.text }]}>{i + 1}</Text>
               <View
                 style={[
                   styles.distBar,
                   {
                     width: `${Math.max((count / maxDist) * 100, 7)}%`,
-                    backgroundColor: count > 0 ? COLORS.correct : COLORS.absent,
+                    backgroundColor: count > 0 ? theme.colors.correct : theme.colors.absent,
                   },
                 ]}
               >
-                <Text style={styles.distCount}>{count}</Text>
+                <Text style={[styles.distCount, { color: theme.colors.text }]}>{count}</Text>
               </View>
             </View>
           ))}
 
           {gameOver && gameMode === 'daily' && (
-            <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
-              <Text style={styles.shareTxt}>PARTILHAR 📤</Text>
+            <TouchableOpacity style={[styles.shareBtn, { backgroundColor: theme.colors.correct }]} onPress={handleShare}>
+              <Text style={[styles.shareTxt, { color: theme.colors.text }]}>PARTILHAR 📤</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -93,28 +95,24 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modal: {
-    backgroundColor: COLORS.modalBg,
     borderRadius: 12,
     padding: 24,
     width: '90%',
     maxWidth: 400,
   },
   closeBtn: { position: 'absolute', top: 12, right: 12 },
-  closeTxt: { color: COLORS.white, fontSize: 20 },
+  closeTxt: { fontSize: 20 },
   answer: {
-    color: COLORS.present,
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 12,
   },
   heading: {
-    color: COLORS.white,
     fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -123,18 +121,17 @@ const styles = StyleSheet.create({
   },
   statsRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10 },
   statItem: { alignItems: 'center' },
-  statVal: { color: COLORS.white, fontSize: 28, fontWeight: 'bold' },
-  statLabel: { color: COLORS.lightGray, fontSize: 11 },
+  statVal: { fontSize: 28, fontWeight: 'bold' },
+  statLabel: { fontSize: 11 },
   distRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 2 },
-  distLabel: { color: COLORS.white, fontSize: 14, width: 20, textAlign: 'right', marginRight: 6 },
+  distLabel: { fontSize: 14, width: 20, textAlign: 'right', marginRight: 6 },
   distBar: { borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, minWidth: 24 },
-  distCount: { color: COLORS.white, fontSize: 13, fontWeight: 'bold', textAlign: 'right' },
+  distCount: { fontSize: 13, fontWeight: 'bold', textAlign: 'right' },
   shareBtn: {
-    backgroundColor: COLORS.correct,
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 16,
   },
-  shareTxt: { color: COLORS.white, fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
+  shareTxt: { fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
 });

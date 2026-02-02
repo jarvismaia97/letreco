@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
+import { View, StyleSheet, StatusBar, Platform, SafeAreaView, ActivityIndicator } from 'react-native';
 import Header from './src/components/Header';
 import ModeSelector from './src/components/ModeSelector';
 import GameModeSelector from './src/components/GameModeSelector';
@@ -9,7 +9,7 @@ import Toast from './src/components/Toast';
 import StatsModal from './src/components/StatsModal';
 import HelpModal from './src/components/HelpModal';
 import { useGame, GameMode } from './src/hooks/useGame';
-import { COLORS } from './src/theme';
+import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 
 function GameScreen({ 
   letterMode, 
@@ -22,6 +22,7 @@ function GameScreen({
   onLetterModeChange: (m: number) => void;
   onGameModeChange: (m: GameMode) => void;
 }) {
+  const { theme } = useTheme();
   const [showHelp, setShowHelp] = useState(false);
   const game = useGame(letterMode, gameMode);
 
@@ -41,11 +42,14 @@ function GameScreen({
     return () => window.removeEventListener('keydown', handler);
   }, [game.onKeyPress]);
 
-  if (!game.loaded) return <View style={styles.container} />;
+  if (!game.loaded) return <View style={[styles.container, { backgroundColor: theme.colors.background }]} />;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <StatusBar 
+        barStyle={theme.name === 'dark' ? "light-content" : "dark-content"} 
+        backgroundColor={theme.colors.background} 
+      />
       <Header onHelp={() => setShowHelp(true)} onStats={() => game.setShowStats(true)} />
       <GameModeSelector gameMode={gameMode} onSelect={onGameModeChange} />
       <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
@@ -76,9 +80,18 @@ function GameScreen({
   );
 }
 
-export default function App() {
+function AppContent() {
+  const { isLoading } = useTheme();
   const [letterMode, setLetterMode] = useState(5);
   const [gameMode, setGameMode] = useState<GameMode>('daily'); // Default to daily mode
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#ffffff" />
+      </SafeAreaView>
+    );
+  }
 
   // key combines both modes to force full remount when switching
   return (
@@ -92,10 +105,22 @@ export default function App() {
   );
 }
 
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  loadingContainer: {
+    backgroundColor: '#121213', // Default dark background for loading
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   boardContainer: {
     flex: 1,

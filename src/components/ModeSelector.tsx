@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 const MODES = [4, 5, 6, 7];
 
@@ -10,15 +10,27 @@ interface Props {
 }
 
 export default function ModeSelector({ mode, onSelect }: Props) {
+  const { theme } = useTheme();
+
   return (
     <View style={styles.container}>
       {MODES.map((m) => (
         <TouchableOpacity
           key={m}
-          style={[styles.pill, mode === m && styles.pillActive]}
+          style={[
+            styles.pill, 
+            { borderColor: theme.colors.lightGray },
+            mode === m && { backgroundColor: theme.colors.correct, borderColor: theme.colors.correct }
+          ]}
           onPress={() => onSelect(m)}
         >
-          <Text style={[styles.text, mode === m && styles.textActive]}>{m} letras</Text>
+          <Text style={[
+            styles.text, 
+            { color: theme.colors.lightGray },
+            mode === m && { color: theme.colors.text }
+          ]}>
+            {m} letras
+          </Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -37,18 +49,9 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: COLORS.lightGray,
-  },
-  pillActive: {
-    backgroundColor: COLORS.correct,
-    borderColor: COLORS.correct,
   },
   text: {
-    color: COLORS.lightGray,
     fontSize: 13,
     fontWeight: '600',
-  },
-  textActive: {
-    color: COLORS.white,
   },
 });

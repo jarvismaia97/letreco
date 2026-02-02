@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { COLORS, TILE_GAP } from '../theme';
+import { TILE_GAP } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 import type { LetterState } from '../hooks/useGame';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function Tile({ letter, state, size, delay = 0, revealing, isCursor, onPress }: Props) {
+  const { theme } = useTheme();
   const flipAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const prevState = useRef(state);
@@ -43,19 +45,19 @@ export default function Tile({ letter, state, size, delay = 0, revealing, isCurs
 
   const bgColor = () => {
     switch (state) {
-      case 'correct': return COLORS.correct;
-      case 'present': return COLORS.present;
-      case 'absent': return COLORS.absent;
+      case 'correct': return theme.colors.correct;
+      case 'present': return theme.colors.present;
+      case 'absent': return theme.colors.absent;
       default: return 'transparent';
     }
   };
 
   const borderColor = isCursor
-    ? '#ffffff'
+    ? theme.colors.text
     : state === 'tbd'
-      ? COLORS.lightGray
+      ? theme.colors.lightGray
       : state === 'empty'
-        ? COLORS.emptyBorder
+        ? theme.colors.emptyBorder
         : 'transparent';
 
   const borderWidth = (state === 'empty' || state === 'tbd') ? 2 : 0;
@@ -72,7 +74,7 @@ export default function Tile({ letter, state, size, delay = 0, revealing, isCurs
   const isRevealed = !revealing || state === 'empty' || state === 'tbd';
 
   const cursorShadow = isCursor ? {
-    shadowColor: '#ffffff',
+    shadowColor: theme.colors.text,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 6,
@@ -80,7 +82,7 @@ export default function Tile({ letter, state, size, delay = 0, revealing, isCurs
   } : {};
 
   const tileContent = (
-    <Text style={[styles.letter, { fontSize: size * 0.5 }]}>{letter}</Text>
+    <Text style={[styles.letter, { fontSize: size * 0.5, color: theme.colors.text }]}>{letter}</Text>
   );
 
   if (isRevealed) {
@@ -122,7 +124,7 @@ export default function Tile({ letter, state, size, delay = 0, revealing, isCurs
           {
             width: size,
             height: size,
-            borderColor: COLORS.lightGray,
+            borderColor: theme.colors.lightGray,
             borderWidth: 2,
             transform: [{ rotateX: frontInterpolate }],
           },
@@ -161,7 +163,6 @@ const styles = StyleSheet.create({
     backfaceVisibility: 'hidden',
   },
   letter: {
-    color: COLORS.white,
     fontWeight: 'bold',
   },
 });

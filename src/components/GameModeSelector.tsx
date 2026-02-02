@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 import { GameMode } from '../hooks/useGame';
 
 interface Props {
@@ -9,22 +9,40 @@ interface Props {
 }
 
 export default function GameModeSelector({ gameMode, onSelect }: Props) {
+  const { theme } = useTheme();
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.pill, gameMode === 'daily' && styles.pillActive]}
+        style={[
+          styles.pill,
+          { borderColor: theme.colors.lightGray },
+          gameMode === 'daily' && { backgroundColor: theme.colors.correct, borderColor: theme.colors.correct }
+        ]}
         onPress={() => onSelect('daily')}
       >
-        <Text style={[styles.text, gameMode === 'daily' && styles.textActive]}>
+        <Text style={[
+          styles.text,
+          { color: theme.colors.lightGray },
+          gameMode === 'daily' && { color: theme.colors.text }
+        ]}>
           🔥 Palavra do Dia
         </Text>
       </TouchableOpacity>
       
       <TouchableOpacity
-        style={[styles.pill, gameMode === 'practice' && styles.pillActive]}
+        style={[
+          styles.pill,
+          { borderColor: theme.colors.lightGray },
+          gameMode === 'practice' && { backgroundColor: theme.colors.correct, borderColor: theme.colors.correct }
+        ]}
         onPress={() => onSelect('practice')}
       >
-        <Text style={[styles.text, gameMode === 'practice' && styles.textActive]}>
+        <Text style={[
+          styles.text,
+          { color: theme.colors.lightGray },
+          gameMode === 'practice' && { color: theme.colors.text }
+        ]}>
           Prática
         </Text>
       </TouchableOpacity>
@@ -45,20 +63,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: COLORS.lightGray,
     minWidth: 120,
     alignItems: 'center',
   },
-  pillActive: {
-    backgroundColor: COLORS.correct,
-    borderColor: COLORS.correct,
-  },
   text: {
-    color: COLORS.lightGray,
     fontSize: 14,
     fontWeight: '600',
-  },
-  textActive: {
-    color: COLORS.white,
   },
 });

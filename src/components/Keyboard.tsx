@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions, Platform } from 'react-native';
-import { COLORS } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 import type { LetterState } from '../hooks/useGame';
 
 const ROWS = [
@@ -14,17 +14,18 @@ interface Props {
   keyColors: Record<string, LetterState>;
 }
 
-function getKeyBg(state?: LetterState): string {
+function getKeyBg(state: LetterState | undefined, theme: any): string {
   switch (state) {
-    case 'correct': return COLORS.correct;
-    case 'present': return COLORS.present;
-    case 'absent': return COLORS.absent;
-    default: return COLORS.keyBg;
+    case 'correct': return theme.colors.correct;
+    case 'present': return theme.colors.present;
+    case 'absent': return theme.colors.absent;
+    default: return theme.colors.keyBg;
   }
 }
 
 export default function Keyboard({ onKeyPress, keyColors }: Props) {
   const { width, height } = useWindowDimensions();
+  const { theme } = useTheme();
   const keyWidth = Math.min(Math.floor((width - 30) / 10), 40);
   const keyHeight = Math.min(52, Math.floor(height * 0.065));
 
@@ -35,7 +36,7 @@ export default function Keyboard({ onKeyPress, keyColors }: Props) {
           {row.map((key) => {
             const isSpecial = key === 'ENTER' || key === '⌫';
             const displayKey = key === '⌫' ? '⌫' : key === 'ENTER' ? 'ENTER' : key;
-            const bg = isSpecial ? COLORS.keyBg : getKeyBg(keyColors[key]);
+            const bg = isSpecial ? theme.colors.keyBg : getKeyBg(keyColors[key], theme);
             const w = isSpecial ? keyWidth * 1.5 : keyWidth;
 
             return (
@@ -45,7 +46,7 @@ export default function Keyboard({ onKeyPress, keyColors }: Props) {
                 onPress={() => onKeyPress(key === '⌫' ? 'BACKSPACE' : key)}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.keyText, isSpecial && { fontSize: 12 }]}>{displayKey}</Text>
+                <Text style={[styles.keyText, { color: theme.colors.keyText }, isSpecial && { fontSize: 12 }]}>{displayKey}</Text>
               </TouchableOpacity>
             );
           })}
@@ -71,7 +72,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   keyText: {
-    color: COLORS.white,
     fontWeight: 'bold',
     fontSize: 16,
   },
