@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
-import GameModeSelector from './components/GameModeSelector';
 import ModeSelector from './components/ModeSelector';
 import Board from './components/Board';
 import Keyboard from './components/Keyboard';
 import Toast from './components/Toast';
 import StatsModal from './components/StatsModal';
 import HelpModal from './components/HelpModal';
+import LeaderboardModal from './components/LeaderboardModal';
+import SpeedDial from './components/SpeedDial';
 import { useGame, type GameMode } from './hooks/useGame';
 import { useTheme } from './hooks/useTheme';
 
@@ -25,8 +26,8 @@ function GameScreen({
 }) {
   const { themeMode, toggleTheme } = useTheme();
   const game = useGame(letterMode, gameMode);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
-  // Show help on first visit
   const [showHelp, setShowHelp] = useState(() => {
     return !localStorage.getItem(HELP_SEEN_KEY);
   });
@@ -36,7 +37,6 @@ function GameScreen({
     localStorage.setItem(HELP_SEEN_KEY, '1');
   };
 
-  // Physical keyboard support
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
@@ -57,14 +57,19 @@ function GameScreen({
 
   return (
     <div className="min-h-dvh bg-base-100 flex flex-col max-w-lg mx-auto relative w-full">
-      <Header
-        themeMode={themeMode}
-        onHelp={() => setShowHelp(true)}
-        onStats={() => game.setShowStats(true)}
-        onToggleTheme={toggleTheme}
-      />
-      <GameModeSelector gameMode={gameMode} onSelect={onGameModeChange} />
+      <Header />
       <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
+
+      <SpeedDial
+        themeMode={themeMode}
+        gameMode={gameMode}
+        onHelp={() => setShowHelp(true)}
+        onToggleTheme={toggleTheme}
+        onStats={() => game.setShowStats(true)}
+        onLeaderboard={() => setShowLeaderboard(true)}
+        onToggleGameMode={() => onGameModeChange(gameMode === 'daily' ? 'practice' : 'daily')}
+      />
+
       <div className="flex-1 flex items-center justify-center">
         <Board
           board={game.board}
@@ -88,6 +93,7 @@ function GameScreen({
         gameMode={gameMode}
       />
       <HelpModal visible={showHelp} onClose={closeHelp} />
+      <LeaderboardModal visible={showLeaderboard} onClose={() => setShowLeaderboard(false)} />
     </div>
   );
 }
