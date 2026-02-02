@@ -56,7 +56,7 @@ function GameScreen({
   }
 
   return (
-    <div className="min-h-dvh bg-base-100 flex flex-col mx-auto relative w-full">
+    <div className="min-h-dvh bg-base-100 flex flex-col max-w-lg mx-auto relative w-full">
       <Header
         themeMode={themeMode}
         onHelp={() => setShowHelp(true)}
