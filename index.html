@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Descubra a palavra portuguesa em 6 tentativas! Clone de Wordle em português." />
+    <meta name="keywords" content="letreco, wordle, português, jogo, palavras, puzzle" />
+    <meta name="author" content="Letreco" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#538d4e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Letreco" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Meta tags for better mobile experience -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    
+    <!-- Social Media Meta Tags -->
+    <meta property="og:title" content="Letreco - Jogo de Palavras" />
+    <meta property="og:description" content="Descubra a palavra portuguesa em 6 tentativas!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://letreco.vercel.app" />
+    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Letreco - Jogo de Palavras" />
+    <meta name="twitter:description" content="Descubra a palavra portuguesa em 6 tentativas!" />
+    
+    <title>Letreco - Jogo de Palavras</title>
+    
+    <style>
+      /* Critical CSS for initial load */
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        background-color: #121213;
+        color: #ffffff;
+        overflow-x: hidden;
+      }
+      
+      /* Loading styles */
+      #root {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .loading {
+        font-size: 24px;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="loading">Carregando Letreco...</div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

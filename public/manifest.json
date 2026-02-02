@@ -1,0 +1,28 @@
+{
+  "name": "Letreco - Jogo de Palavras",
+  "short_name": "Letreco",
+  "description": "Descubra a palavra portuguesa em 6 tentativas! Clone de Wordle em português.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121213",
+  "theme_color": "#538d4e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "education"],
+  "lang": "pt-PT",
+  "scope": "/",
+  "id": "letreco-app"
+}
