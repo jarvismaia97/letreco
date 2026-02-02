@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAnswers, getValidWords } from '../data/words';
 import { getDailyWord, getDayNumber } from '../utils/daily';
 import { normalize } from '../utils/accents';
-import { MAX_ATTEMPTS } from '../theme';
+import { MAX_ATTEMPTS } from '../constants';
 
 export type LetterState = 'correct' | 'present' | 'absent' | 'empty' | 'tbd';
 export type GameMode = 'daily' | 'practice';
@@ -18,7 +17,7 @@ export interface GameStats {
   wins: number;
   currentStreak: number;
   maxStreak: number;
-  distribution: number[]; // index 0 = won in 1 guess, etc.
+  distribution: number[];
   lastPlayedDay?: number;
 }
 
@@ -38,12 +37,10 @@ function evaluateGuess(guess: string, answer: string): LetterState[] {
   const result: LetterState[] = new Array(len).fill('absent');
   const answerCounts: Record<string, number> = {};
 
-  // Count letters in answer
   for (const ch of normAnswer) {
     answerCounts[ch] = (answerCounts[ch] || 0) + 1;
   }
 
-  // First pass: correct positions
   for (let i = 0; i < len; i++) {
     if (normGuess[i] === normAnswer[i]) {
       result[i] = 'correct';
@@ -51,7 +48,6 @@ function evaluateGuess(guess: string, answer: string): LetterState[] {
     }
   }
 
-  // Second pass: present but wrong position
   for (let i = 0; i < len; i++) {
     if (result[i] !== 'correct' && answerCounts[normGuess[i]] > 0) {
       result[i] = 'present';
@@ -62,13 +58,23 @@ function evaluateGuess(guess: string, answer: string): LetterState[] {
   return result;
 }
 
+function loadJSON<T>(key: string): T | null {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : null;
+  } catch { return null; }
+}
+
+function saveJSON(key: string, val: unknown) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
 export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
   const answers = getAnswers(letterMode);
   const validWords = getValidWords(letterMode);
   const dayNumber = getDayNumber();
-  
-  // For practice mode, pick a random word; for daily mode, use the daily word
-  const targetWord = gameMode === 'daily' 
+
+  const targetWord = gameMode === 'daily'
     ? getDailyWord(answers, letterMode)
     : answers[Math.floor(Math.random() * answers.length)];
 
@@ -83,7 +89,6 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
   const [showStats, setShowStats] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
-  // Reset state when letterMode or gameMode changes
   useEffect(() => {
     setGuesses([]);
     setCurrentInput([]);
@@ -95,52 +100,36 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
     setLoaded(false);
   }, [letterMode, gameMode]);
 
-  // Load saved state
   useEffect(() => {
-    (async () => {
-      try {
-        // Stats are shared between game modes but separate by letter count
-        const savedStats = await AsyncStorage.getItem(`letreco_stats_${letterMode}`);
-        if (savedStats) {
-          const stats = JSON.parse(savedStats);
-          // Check for streak reset for daily mode only
-          if (gameMode === 'daily' && stats.lastPlayedDay && dayNumber - stats.lastPlayedDay > 1) {
-            stats.currentStreak = 0;
-          }
-          setStats(stats);
-        }
+    const savedStats = loadJSON<GameStats>(`letreco_stats_${letterMode}`);
+    if (savedStats) {
+      if (gameMode === 'daily' && savedStats.lastPlayedDay && dayNumber - savedStats.lastPlayedDay > 1) {
+        savedStats.currentStreak = 0;
+      }
+      setStats(savedStats);
+    }
 
-        // Only load saved state for daily mode
-        if (gameMode === 'daily') {
-          const savedState = await AsyncStorage.getItem(`letreco_state_${letterMode}_daily_${dayNumber}`);
-          if (savedState) {
-            const state = JSON.parse(savedState);
-            setGuesses(state.guesses || []);
-            setGameOver(state.gameOver || false);
-            setWon(state.won || false);
-          }
-        }
-      } catch {}
-      setLoaded(true);
-    })();
+    if (gameMode === 'daily') {
+      const savedState = loadJSON<{ guesses: TileData[][]; gameOver: boolean; won: boolean }>(
+        `letreco_state_${letterMode}_daily_${dayNumber}`
+      );
+      if (savedState) {
+        setGuesses(savedState.guesses || []);
+        setGameOver(savedState.gameOver || false);
+        setWon(savedState.won || false);
+      }
+    }
+    setLoaded(true);
   }, [letterMode, gameMode, dayNumber]);
 
-  // Save state (only for daily mode)
-  const saveState = useCallback(async (g: TileData[][], over: boolean, w: boolean) => {
+  const saveState = useCallback((g: TileData[][], over: boolean, w: boolean) => {
     if (gameMode === 'daily') {
-      try {
-        await AsyncStorage.setItem(
-          `letreco_state_${letterMode}_daily_${dayNumber}`,
-          JSON.stringify({ guesses: g, gameOver: over, won: w })
-        );
-      } catch {}
+      saveJSON(`letreco_state_${letterMode}_daily_${dayNumber}`, { guesses: g, gameOver: over, won: w });
     }
   }, [letterMode, gameMode, dayNumber]);
 
-  const saveStats = useCallback(async (s: GameStats) => {
-    try {
-      await AsyncStorage.setItem(`letreco_stats_${letterMode}`, JSON.stringify(s));
-    } catch {}
+  const saveStats = useCallback((s: GameStats) => {
+    saveJSON(`letreco_stats_${letterMode}`, s);
   }, [letterMode]);
 
   const showToast = useCallback((msg: string) => {
@@ -152,7 +141,6 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
     if (gameOver) return;
 
     if (key === 'ENTER') {
-      // Check all slots are filled
       const filled = currentInput.filter(c => c !== '');
       if (filled.length !== letterMode) {
         showToast(`A palavra deve ter ${letterMode} letras`);
@@ -186,8 +174,7 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
         setTimeout(() => {
           setGameOver(true);
           setWon(isWin);
-          
-          // Only update stats for daily mode to track streaks properly
+
           if (gameMode === 'daily') {
             const newStats = { ...stats, played: stats.played + 1, lastPlayedDay: dayNumber };
             if (isWin) {
@@ -210,15 +197,12 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
     } else if (key === 'BACKSPACE') {
       setCurrentInput((prev) => {
         const chars = [...prev];
-        // Ensure array is right size
         while (chars.length < letterMode) chars.push('');
 
         if (chars[cursorPosition] && chars[cursorPosition] !== '') {
-          // Clear letter at cursor position
           chars[cursorPosition] = '';
           return chars;
         } else if (cursorPosition > 0) {
-          // Move back to previous position and clear it
           const newPos = cursorPosition - 1;
           chars[newPos] = '';
           setCursorPosition(newPos);
@@ -227,22 +211,17 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
         return prev;
       });
     } else {
-      // Letter key
       setCurrentInput((prev) => {
         const chars = [...prev];
-        // Ensure array is right size
         while (chars.length < letterMode) chars.push('');
 
-        // Place letter at cursor position
         chars[cursorPosition] = key.toUpperCase();
 
-        // Advance cursor to next empty spot
         let nextPos = cursorPosition + 1;
         while (nextPos < letterMode && chars[nextPos] && chars[nextPos] !== '') {
           nextPos++;
         }
         if (nextPos >= letterMode) {
-          // If no empty spot after, find first empty from start
           for (let i = 0; i < letterMode; i++) {
             if (!chars[i] || chars[i] === '') {
               nextPos = i;
@@ -256,7 +235,6 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
     }
   }, [gameOver, currentInput, cursorPosition, letterMode, gameMode, validWords, targetWord, guesses, stats, dayNumber, saveState, saveStats, showToast]);
 
-  // Keyboard colors
   const keyboardColors = useCallback((): Record<string, LetterState> => {
     const colors: Record<string, LetterState> = {};
     for (const row of guesses) {
@@ -275,10 +253,9 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
     return colors;
   }, [guesses]);
 
-  // Share
   const shareResult = useCallback((): string => {
     if (gameMode === 'practice') return '';
-    
+
     const emojiMap: Record<string, string> = {
       correct: '🟩',
       present: '🟨',
@@ -290,24 +267,19 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
     const result = won ? `${guesses.length}/${MAX_ATTEMPTS}` : `X/${MAX_ATTEMPTS}`;
     const today = new Date();
     const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
-    
-    return `Letreco ${dayNumber} (${letterMode} letras) ${result} ⭐\n${dateStr}\n\n${grid}`;
+
+    return `Letreco ${dayNumber} (${letterMode} letras) ${result} ⭐\n${dateStr}\n\n${grid}\n\nhttps://letreco.openclaw.ai`;
   }, [guesses, won, dayNumber, letterMode, gameMode]);
 
-  // Build board data
   const board: TileData[][] = [];
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
     if (i < guesses.length) {
       board.push(guesses[i]);
     } else if (i === guesses.length && !gameOver) {
-      // Current input row
       const row: TileData[] = [];
       for (let j = 0; j < letterMode; j++) {
         const ch = currentInput[j] || '';
-        row.push({
-          letter: ch.toUpperCase(),
-          state: ch ? 'tbd' : 'empty',
-        });
+        row.push({ letter: ch.toUpperCase(), state: ch ? 'tbd' : 'empty' });
       }
       board.push(row);
     } else {

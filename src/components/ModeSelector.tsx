@@ -1,7 +1,3 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
-
 const MODES = [4, 5, 6, 7];
 
 interface Props {
@@ -10,48 +6,21 @@ interface Props {
 }
 
 export default function ModeSelector({ mode, onSelect }: Props) {
-  const { theme } = useTheme();
-
   return (
-    <View style={styles.container}>
+    <div className="flex justify-center gap-2 py-2">
       {MODES.map((m) => (
-        <TouchableOpacity
+        <button
           key={m}
-          style={[
-            styles.pill, 
-            { borderColor: theme.colors.lightGray },
-            mode === m && { backgroundColor: theme.colors.correct, borderColor: theme.colors.correct }
-          ]}
-          onPress={() => onSelect(m)}
+          className={`btn btn-xs rounded-full px-3 ${
+            mode === m
+              ? 'bg-[var(--color-correct)] border-[var(--color-correct)] text-white hover:bg-[var(--color-correct)]'
+              : 'btn-outline border-base-content/30 text-base-content/60'
+          }`}
+          onClick={() => onSelect(m)}
         >
-          <Text style={[
-            styles.text, 
-            { color: theme.colors.lightGray },
-            mode === m && { color: theme.colors.text }
-          ]}>
-            {m} letras
-          </Text>
-        </TouchableOpacity>
+          {m} letras
+        </button>
       ))}
-    </View>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    gap: 8,
-  },
-  pill: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  text: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-});

@@ -1,7 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import Tile from './Tile';
-import { TILE_GAP, MAX_ATTEMPTS } from '../theme';
+import { MAX_ATTEMPTS } from '../constants';
 import type { TileData } from '../hooks/useGame';
 
 interface Props {
@@ -14,21 +12,18 @@ interface Props {
 }
 
 export default function Board({ board, mode, revealingRow, currentRowIndex, cursorPosition, onTilePress }: Props) {
-  const { width, height } = useWindowDimensions();
+  const availableHeight = window.innerHeight - 350;
+  const availableWidth = window.innerWidth - 20;
+  const gap = 5;
 
-  // Calculate tile size based on available space
-  // Reserve: header ~50, mode selector ~50, keyboard ~210, padding ~40
-  const availableHeight = height - 350;
-  const availableWidth = width - 20;
-
-  const maxTileFromWidth = Math.floor((availableWidth - (mode - 1) * TILE_GAP) / mode);
-  const maxTileFromHeight = Math.floor((availableHeight - (MAX_ATTEMPTS - 1) * TILE_GAP) / MAX_ATTEMPTS);
-  const tileSize = Math.min(maxTileFromWidth, maxTileFromHeight, 68);
+  const maxFromW = Math.floor((availableWidth - (mode - 1) * gap) / mode);
+  const maxFromH = Math.floor((availableHeight - (MAX_ATTEMPTS - 1) * gap) / MAX_ATTEMPTS);
+  const tileSize = Math.min(maxFromW, maxFromH, 68);
 
   return (
-    <View style={styles.container}>
+    <div className="flex flex-col items-center py-1">
       {board.map((row, rowIdx) => (
-        <View key={rowIdx} style={styles.row}>
+        <div key={rowIdx} className="flex">
           {row.map((tile, colIdx) => (
             <Tile
               key={`${rowIdx}-${colIdx}`}
@@ -41,18 +36,8 @@ export default function Board({ board, mode, revealingRow, currentRowIndex, curs
               onPress={rowIdx === currentRowIndex ? () => onTilePress(colIdx) : undefined}
             />
           ))}
-        </View>
+        </div>
       ))}
-    </View>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    paddingVertical: 5,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-});

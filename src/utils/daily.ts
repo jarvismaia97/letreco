@@ -1,4 +1,3 @@
-// Simple seeded PRNG (mulberry32)
 function mulberry32(seed: number) {
   return () => {
     let t = (seed += 0x6d2b79f5);
@@ -11,7 +10,6 @@ function mulberry32(seed: number) {
 export function getDailyWord(words: string[], mode: number): string {
   const now = new Date();
   const dateStr = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-  // hash the date string + mode
   let hash = mode * 9999;
   for (let i = 0; i < dateStr.length; i++) {
     hash = (hash * 31 + dateStr.charCodeAt(i)) | 0;

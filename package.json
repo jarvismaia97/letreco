@@ -1,28 +1,26 @@
 {
   "name": "letreco-app",
   "version": "1.0.0",
-  "main": "index.ts",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "build:web": "expo export -p web"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "~54.0.32",
-    "expo-clipboard": "~8.0.8",
-    "expo-font": "~14.0.11",
-    "expo-status-bar": "~3.0.9",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.5",
-    "react-native-web": "~0.19.13"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
-    "typescript": "~5.9.2"
-  },
-  "private": true
+    "@tailwindcss/vite": "^4.1.8",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.4.1",
+    "daisyui": "^5.0.35",
+    "tailwindcss": "^4.1.8",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  }
 }

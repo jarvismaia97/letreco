@@ -1,7 +1,4 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { TILE_GAP } from '../theme';
-import { useTheme } from '../contexts/ThemeContext';
+import { useEffect, useRef, useState } from 'react';
 import type { LetterState } from '../hooks/useGame';
 
 interface Props {
@@ -14,155 +11,68 @@ interface Props {
   onPress?: () => void;
 }
 
+function bgClass(state: LetterState): string {
+  switch (state) {
+    case 'correct': return 'bg-[var(--color-correct)]';
+    case 'present': return 'bg-[var(--color-present)]';
+    case 'absent': return 'bg-[var(--color-absent)]';
+    default: return '';
+  }
+}
+
 export default function Tile({ letter, state, size, delay = 0, revealing, isCursor, onPress }: Props) {
-  const { theme } = useTheme();
-  const flipAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [flipped, setFlipped] = useState(false);
+  const [pop, setPop] = useState(false);
   const prevState = useRef(state);
 
   useEffect(() => {
     if (revealing && (state === 'correct' || state === 'present' || state === 'absent')) {
-      Animated.sequence([
-        Animated.delay(delay),
-        Animated.timing(flipAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      const timer = setTimeout(() => setFlipped(true), delay);
+      return () => clearTimeout(timer);
     }
   }, [revealing, state, delay]);
 
   useEffect(() => {
     if (letter && state === 'tbd' && prevState.current === 'empty') {
-      Animated.sequence([
-        Animated.timing(scaleAnim, { toValue: 1.1, duration: 50, useNativeDriver: true }),
-        Animated.timing(scaleAnim, { toValue: 1, duration: 50, useNativeDriver: true }),
-      ]).start();
+      setPop(true);
+      const t = setTimeout(() => setPop(false), 100);
+      prevState.current = state;
+      return () => clearTimeout(t);
     }
     prevState.current = state;
   }, [letter, state]);
 
-  const bgColor = () => {
-    switch (state) {
-      case 'correct': return theme.colors.correct;
-      case 'present': return theme.colors.present;
-      case 'absent': return theme.colors.absent;
-      default: return 'transparent';
-    }
-  };
+  const isRevealed = state === 'correct' || state === 'present' || state === 'absent';
+  const showBg = isRevealed && (!revealing || flipped);
 
-  const borderColor = isCursor
-    ? theme.colors.text
-    : state === 'tbd'
-      ? theme.colors.lightGray
-      : state === 'empty'
-        ? theme.colors.emptyBorder
-        : 'transparent';
-
-  const borderWidth = (state === 'empty' || state === 'tbd') ? 2 : 0;
-
-  const frontInterpolate = flipAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: ['0deg', '90deg', '90deg'],
-  });
-  const backInterpolate = flipAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: ['90deg', '90deg', '0deg'],
-  });
-
-  const isRevealed = !revealing || state === 'empty' || state === 'tbd';
-
-  const cursorShadow = isCursor ? {
-    shadowColor: theme.colors.text,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 6,
-    elevation: 8,
-  } : {};
-
-  const tileContent = (
-    <Text style={[styles.letter, { fontSize: size * 0.5, color: theme.colors.text }]}>{letter}</Text>
-  );
-
-  if (isRevealed) {
-    const inner = (
-      <Animated.View
-        style={[
-          styles.tile,
-          cursorShadow,
-          {
-            width: size,
-            height: size,
-            backgroundColor: bgColor(),
-            borderColor,
-            borderWidth: isCursor ? 2.5 : borderWidth,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
-      >
-        {tileContent}
-      </Animated.View>
-    );
-
-    if (onPress) {
-      return (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-          {inner}
-        </TouchableOpacity>
-      );
-    }
-    return inner;
-  }
+  const borderStyle = isCursor
+    ? 'border-2.5 border-base-content shadow-[0_0_6px_rgba(255,255,255,0.4)]'
+    : isRevealed
+      ? 'border-0'
+      : state === 'tbd'
+        ? 'border-2 border-[var(--color-empty-border)]'
+        : 'border-2 border-base-300';
 
   return (
-    <Animated.View style={{ width: size, height: size }}>
-      <Animated.View
-        style={[
-          styles.tile,
-          styles.tileFace,
-          {
-            width: size,
-            height: size,
-            borderColor: theme.colors.lightGray,
-            borderWidth: 2,
-            transform: [{ rotateX: frontInterpolate }],
-          },
-        ]}
-      >
-        {tileContent}
-      </Animated.View>
-      <Animated.View
-        style={[
-          styles.tile,
-          styles.tileFace,
-          {
-            width: size,
-            height: size,
-            backgroundColor: bgColor(),
-            transform: [{ rotateX: backInterpolate }],
-          },
-        ]}
-      >
-        {tileContent}
-      </Animated.View>
-    </Animated.View>
+    <div
+      className={`
+        flex items-center justify-center font-bold select-none
+        ${borderStyle}
+        ${showBg ? bgClass(state) : ''}
+        ${revealing && flipped ? 'animate-flip' : ''}
+        ${pop ? 'animate-pop' : ''}
+        ${onPress ? 'cursor-pointer' : ''}
+      `}
+      style={{
+        width: size,
+        height: size,
+        fontSize: size * 0.5,
+        margin: 2.5,
+        transition: 'background-color 0.1s',
+      }}
+      onClick={onPress}
+    >
+      <span className="text-white">{letter}</span>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  tile: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: TILE_GAP / 2,
-  },
-  tileFace: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backfaceVisibility: 'hidden',
-  },
-  letter: {
-    fontWeight: 'bold',
-  },
-});

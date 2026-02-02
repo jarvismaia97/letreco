@@ -1,8 +1,4 @@
-import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Share, Platform } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
-import { MAX_ATTEMPTS } from '../theme';
-import { useTheme } from '../contexts/ThemeContext';
+import { MAX_ATTEMPTS } from '../constants';
 import type { GameStats, GameMode } from '../hooks/useGame';
 
 interface Props {
@@ -17,121 +13,89 @@ interface Props {
 }
 
 export default function StatsModal({ visible, onClose, stats, gameOver, won, answer, shareText, gameMode }: Props) {
-  const { theme } = useTheme();
+  if (!visible) return null;
+
   const winPct = stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0;
   const maxDist = Math.max(...stats.distribution, 1);
 
   const handleShare = async () => {
-    if (Platform.OS === 'web') {
-      await Clipboard.setStringAsync(shareText);
+    try {
+      await navigator.clipboard.writeText(shareText);
       alert('Resultado copiado!');
-    } else {
-      try {
-        await Share.share({ message: shareText });
-      } catch {
-        await Clipboard.setStringAsync(shareText);
-      }
+    } catch {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = shareText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('Resultado copiado!');
     }
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={[styles.overlay, { backgroundColor: theme.colors.modalOverlay }]}>
-        <View style={[styles.modal, { backgroundColor: theme.colors.modalBg }]}>
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <Text style={[styles.closeTxt, { color: theme.colors.text }]}>✕</Text>
-          </TouchableOpacity>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={onClose}>
+      <div
+        className="bg-base-200 rounded-xl p-6 w-[90%] max-w-md relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="btn btn-ghost btn-sm btn-circle absolute top-3 right-3" onClick={onClose}>
+          ✕
+        </button>
 
-          {gameOver && !won && (
-            <Text style={[styles.answer, { color: theme.colors.present }]}>A palavra era: {answer}</Text>
-          )}
+        {gameOver && !won && (
+          <p className="text-center font-bold text-[var(--color-present)] mb-3">
+            A palavra era: {answer}
+          </p>
+        )}
 
-          <Text style={[styles.heading, { color: theme.colors.text }]}>ESTATÍSTICAS</Text>
-          <View style={styles.statsRow}>
-            {[
-              { val: stats.played, label: 'Jogos' },
-              { val: winPct, label: '% Vitórias' },
-              { val: stats.currentStreak, label: 'Sequência', emoji: '🔥' },
-              { val: stats.maxStreak, label: 'Melhor Seq.', emoji: '🔥' },
-            ].map((s, i) => (
-              <View key={i} style={styles.statItem}>
-                <Text style={[styles.statVal, { color: theme.colors.text }]}>
-                  {s.emoji && s.val > 0 ? `${s.emoji} ` : ''}{s.val}
-                </Text>
-                <Text style={[styles.statLabel, { color: theme.colors.lightGray }]}>{s.label}</Text>
-              </View>
-            ))}
-          </View>
+        <h2 className="text-center font-bold text-sm tracking-widest mb-3">ESTATÍSTICAS</h2>
 
-          <Text style={[styles.heading, { color: theme.colors.text }]}>DISTRIBUIÇÃO</Text>
-          {stats.distribution.map((count, i) => (
-            <View key={i} style={styles.distRow}>
-              <Text style={[styles.distLabel, { color: theme.colors.text }]}>{i + 1}</Text>
-              <View
-                style={[
-                  styles.distBar,
-                  {
-                    width: `${Math.max((count / maxDist) * 100, 7)}%`,
-                    backgroundColor: count > 0 ? theme.colors.correct : theme.colors.absent,
-                  },
-                ]}
-              >
-                <Text style={[styles.distCount, { color: theme.colors.text }]}>{count}</Text>
-              </View>
-            </View>
+        <div className="flex justify-around mb-4">
+          {[
+            { val: stats.played, label: 'Jogos' },
+            { val: winPct, label: '% Vitórias' },
+            { val: stats.currentStreak, label: 'Sequência', emoji: '🔥' },
+            { val: stats.maxStreak, label: 'Melhor Seq.', emoji: '🔥' },
+          ].map((s, i) => (
+            <div key={i} className="text-center">
+              <div className="text-2xl font-bold">
+                {s.emoji && s.val > 0 ? `${s.emoji} ` : ''}{s.val}
+              </div>
+              <div className="text-xs text-base-content/60">{s.label}</div>
+            </div>
           ))}
+        </div>
 
-          {gameOver && gameMode === 'daily' && (
-            <TouchableOpacity style={[styles.shareBtn, { backgroundColor: theme.colors.correct }]} onPress={handleShare}>
-              <Text style={[styles.shareTxt, { color: theme.colors.text }]}>PARTILHAR 📤</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-    </Modal>
+        <h2 className="text-center font-bold text-sm tracking-widest mb-2">DISTRIBUIÇÃO</h2>
+
+        <div className="space-y-1 mb-4">
+          {stats.distribution.map((count, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="w-4 text-right text-sm font-bold">{i + 1}</span>
+              <div
+                className="rounded px-2 py-0.5 text-right text-sm font-bold text-white"
+                style={{
+                  width: `${Math.max((count / maxDist) * 100, 7)}%`,
+                  backgroundColor: count > 0 ? 'var(--color-correct)' : 'var(--color-absent)',
+                }}
+              >
+                {count}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {gameOver && gameMode === 'daily' && (
+          <button
+            className="btn w-full bg-[var(--color-correct)] hover:bg-[var(--color-correct)] text-white font-bold text-base tracking-wide border-none"
+            onClick={handleShare}
+          >
+            PARTILHAR 📤
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modal: {
-    borderRadius: 12,
-    padding: 24,
-    width: '90%',
-    maxWidth: 400,
-  },
-  closeBtn: { position: 'absolute', top: 12, right: 12 },
-  closeTxt: { fontSize: 20 },
-  answer: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  heading: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 10,
-    letterSpacing: 1,
-  },
-  statsRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10 },
-  statItem: { alignItems: 'center' },
-  statVal: { fontSize: 28, fontWeight: 'bold' },
-  statLabel: { fontSize: 11 },
-  distRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 2 },
-  distLabel: { fontSize: 14, width: 20, textAlign: 'right', marginRight: 6 },
-  distBar: { borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, minWidth: 24 },
-  distCount: { fontSize: 13, fontWeight: 'bold', textAlign: 'right' },
-  shareBtn: {
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  shareTxt: { fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
-});

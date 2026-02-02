@@ -1,7 +1,4 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
-import { GameMode } from '../hooks/useGame';
+import type { GameMode } from '../hooks/useGame';
 
 interface Props {
   gameMode: GameMode;
@@ -9,65 +6,28 @@ interface Props {
 }
 
 export default function GameModeSelector({ gameMode, onSelect }: Props) {
-  const { theme } = useTheme();
-
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={[
-          styles.pill,
-          { borderColor: theme.colors.lightGray },
-          gameMode === 'daily' && { backgroundColor: theme.colors.correct, borderColor: theme.colors.correct }
-        ]}
-        onPress={() => onSelect('daily')}
+    <div className="flex justify-center gap-3 py-2 mb-1">
+      <button
+        className={`btn btn-sm rounded-full min-w-[130px] ${
+          gameMode === 'daily'
+            ? 'bg-[var(--color-correct)] border-[var(--color-correct)] text-white hover:bg-[var(--color-correct)]'
+            : 'btn-outline border-base-content/30 text-base-content/60'
+        }`}
+        onClick={() => onSelect('daily')}
       >
-        <Text style={[
-          styles.text,
-          { color: theme.colors.lightGray },
-          gameMode === 'daily' && { color: theme.colors.text }
-        ]}>
-          🔥 Palavra do Dia
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity
-        style={[
-          styles.pill,
-          { borderColor: theme.colors.lightGray },
-          gameMode === 'practice' && { backgroundColor: theme.colors.correct, borderColor: theme.colors.correct }
-        ]}
-        onPress={() => onSelect('practice')}
+        🔥 Palavra do Dia
+      </button>
+      <button
+        className={`btn btn-sm rounded-full min-w-[100px] ${
+          gameMode === 'practice'
+            ? 'bg-[var(--color-correct)] border-[var(--color-correct)] text-white hover:bg-[var(--color-correct)]'
+            : 'btn-outline border-base-content/30 text-base-content/60'
+        }`}
+        onClick={() => onSelect('practice')}
       >
-        <Text style={[
-          styles.text,
-          { color: theme.colors.lightGray },
-          gameMode === 'practice' && { color: theme.colors.text }
-        ]}>
-          Prática
-        </Text>
-      </TouchableOpacity>
-    </View>
+        Prática
+      </button>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    gap: 12,
-    marginBottom: 8,
-  },
-  pill: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    minWidth: 120,
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
