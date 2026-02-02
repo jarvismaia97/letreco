@@ -27,6 +27,7 @@ function GameScreen({
   const { themeMode, toggleTheme } = useTheme();
   const game = useGame(letterMode, gameMode);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [modeToast, setModeToast] = useState('');
 
   const [showHelp, setShowHelp] = useState(() => {
     return !localStorage.getItem(HELP_SEEN_KEY);
@@ -67,7 +68,12 @@ function GameScreen({
         onToggleTheme={toggleTheme}
         onStats={() => game.setShowStats(true)}
         onLeaderboard={() => setShowLeaderboard(true)}
-        onToggleGameMode={() => onGameModeChange(gameMode === 'daily' ? 'practice' : 'daily')}
+        onToggleGameMode={() => {
+          const next = gameMode === 'daily' ? 'practice' : 'daily';
+          onGameModeChange(next);
+          setModeToast(next === 'daily' ? '☀️ Modo Palavra do Dia ativado' : '🔄 Modo Treino ativado');
+          setTimeout(() => setModeToast(''), 2000);
+        }}
       />
 
       <div className="flex-1 flex items-center justify-center">
@@ -80,7 +86,7 @@ function GameScreen({
           onTilePress={(col) => game.setCursorPosition(col)}
         />
       </div>
-      <Toast message={game.toastMessage} />
+      <Toast message={game.toastMessage || modeToast} />
       <Keyboard onKeyPress={game.onKeyPress} keyColors={game.keyboardColors()} />
       <StatsModal
         visible={game.showStats}
