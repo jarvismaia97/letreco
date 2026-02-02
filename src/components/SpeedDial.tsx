@@ -11,7 +11,6 @@ interface Props {
   onToggleGameMode: () => void;
 }
 
-/* SVG icons */
 const HelpIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -49,16 +48,6 @@ const GamepadIcon = () => (
   </svg>
 );
 
-// Flower positions: arranged in an arc from bottom-right
-// Each item gets angle-based positioning relative to the FAB
-const FLOWER_POSITIONS = [
-  { x: -60, y: 0 },    // left
-  { x: -50, y: -40 },  // upper-left
-  { x: -25, y: -60 },  // upper
-  { x: 5, y: -60 },    // upper-right-ish
-  { x: -55, y: 45 },   // lower-left
-];
-
 export default function SpeedDial({
   themeMode,
   gameMode,
@@ -89,23 +78,44 @@ export default function SpeedDial({
   ];
 
   return (
-    <div ref={ref} className="fixed top-4 right-4 z-40" style={{ width: 120, height: 120 }}>
-      {/* Flower items */}
+    <div ref={ref} className="fixed top-3 right-3 z-40">
+      {/* Main FAB */}
+      <button
+        className="btn btn-circle btn-primary shadow-xl relative z-10 transition-transform duration-200"
+        onClick={() => setOpen(!open)}
+        aria-label="Menu"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-6 w-6 transition-transform duration-200 ${open ? 'rotate-45' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      </button>
+
+      {/* Flower items - expand downward-left from FAB */}
       {items.map((item, i) => {
-        const pos = FLOWER_POSITIONS[i];
+        // Spread items in an arc going down-left
+        const angle = Math.PI * 0.5 + (i / (items.length - 1)) * Math.PI * 0.55;
+        const radius = 65;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+
         return (
           <div
             key={i}
-            className="absolute tooltip tooltip-left"
+            className="absolute top-2 right-2 tooltip tooltip-left"
             data-tip={item.label}
             style={{
-              right: 4,
-              top: 4,
               transform: open
-                ? `translate(${pos.x}px, ${pos.y}px) scale(1)`
+                ? `translate(${x}px, ${y}px) scale(1)`
                 : 'translate(0, 0) scale(0)',
               opacity: open ? 1 : 0,
-              transition: `all 200ms cubic-bezier(0.4, 0, 0.2, 1) ${open ? i * 40 : 0}ms`,
+              transition: `all 250ms cubic-bezier(0.34, 1.56, 0.64, 1) ${open ? i * 50 : 0}ms`,
             }}
           >
             <button
@@ -120,17 +130,6 @@ export default function SpeedDial({
           </div>
         );
       })}
-
-      {/* Main FAB button */}
-      <button
-        className={`btn btn-circle btn-primary shadow-xl absolute right-0 top-0 z-10 transition-transform duration-200 ${open ? 'rotate-45' : ''}`}
-        onClick={() => setOpen(!open)}
-        aria-label="Menu"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-      </button>
     </div>
   );
 }
