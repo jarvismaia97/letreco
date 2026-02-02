@@ -15,7 +15,7 @@ export default function Header({ themeMode, onHelp, onStats, onToggleTheme }: Pr
       >
         ?
       </button>
-      <img src="/letreco-logo.jpg" alt="Letreco" className="h-8 md:h-10 select-none" />
+      <img src="/letreco-logo.png" alt="Letreco" className="h-8 md:h-10 select-none" />
       <div className="flex gap-1">
         <button
           className="btn btn-circle btn-ghost btn-sm text-lg"
