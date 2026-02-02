@@ -73,7 +73,7 @@ export default function SpeedDial({
     { icon: <HelpIcon />, label: 'Como jogar', action: onHelp },
     { icon: themeMode === 'dark' ? <SunIcon /> : <MoonIcon />, label: themeMode === 'dark' ? 'Tema claro' : 'Tema escuro', action: onToggleTheme, keepOpen: true },
     { icon: <ChartIcon />, label: 'Estatísticas', action: onStats },
-    { icon: <TrophyIcon />, label: 'Leaderboard', action: onLeaderboard },
+    // { icon: <TrophyIcon />, label: 'Leaderboard', action: onLeaderboard },
     { icon: <GamepadIcon />, label: gameMode === 'daily' ? 'Treino' : 'Palavra do Dia', action: onToggleGameMode },
   ];
 
