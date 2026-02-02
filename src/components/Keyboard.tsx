@@ -21,29 +21,25 @@ function keyBg(state: LetterState | undefined): string {
 }
 
 export default function Keyboard({ onKeyPress, keyColors }: Props) {
-  const keyWidth = Math.min(Math.floor((window.innerWidth - 30) / 10), 44);
-  const keyHeight = Math.min(58, Math.floor(window.innerHeight * 0.065));
-
   return (
-    <div className="flex flex-col items-center pb-2">
+    <div className="w-full px-1 pb-2">
       {ROWS.map((row, i) => (
-        <div key={i} className="flex my-[3px]">
+        <div key={i} className="flex w-full my-[3px] gap-[3px]">
           {row.map((key) => {
             const isSpecial = key === 'ENTER' || key === '⌫';
             const display = key === '⌫' ? '⌫' : key;
             const bg = isSpecial ? 'bg-[var(--color-key-bg)]' : keyBg(keyColors[key]);
-            const w = isSpecial ? keyWidth * 1.5 : keyWidth;
 
             return (
               <button
                 key={key}
                 className={`
-                  ${bg} text-white font-bold rounded mx-[2.5px]
+                  ${bg} text-white font-bold rounded
                   flex items-center justify-center select-none
                   active:opacity-70 transition-opacity
-                  ${isSpecial ? 'text-xs' : 'text-base'}
+                  h-14
+                  ${isSpecial ? 'flex-[1.5] text-xs' : 'flex-1 text-base'}
                 `}
-                style={{ width: w, height: keyHeight }}
                 onClick={() => onKeyPress(key === '⌫' ? 'BACKSPACE' : key)}
               >
                 {display}
