@@ -2,17 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
 import Header from './src/components/Header';
 import ModeSelector from './src/components/ModeSelector';
+import GameModeSelector from './src/components/GameModeSelector';
 import Board from './src/components/Board';
 import Keyboard from './src/components/Keyboard';
 import Toast from './src/components/Toast';
 import StatsModal from './src/components/StatsModal';
 import HelpModal from './src/components/HelpModal';
-import { useGame } from './src/hooks/useGame';
+import { useGame, GameMode } from './src/hooks/useGame';
 import { COLORS } from './src/theme';
 
-function GameScreen({ mode, onModeChange }: { mode: number; onModeChange: (m: number) => void }) {
+function GameScreen({ 
+  letterMode, 
+  gameMode, 
+  onLetterModeChange, 
+  onGameModeChange 
+}: { 
+  letterMode: number; 
+  gameMode: GameMode;
+  onLetterModeChange: (m: number) => void;
+  onGameModeChange: (m: GameMode) => void;
+}) {
   const [showHelp, setShowHelp] = useState(false);
-  const game = useGame(mode);
+  const game = useGame(letterMode, gameMode);
 
   // Physical keyboard support (web)
   useEffect(() => {
@@ -36,11 +47,12 @@ function GameScreen({ mode, onModeChange }: { mode: number; onModeChange: (m: nu
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <Header onHelp={() => setShowHelp(true)} onStats={() => game.setShowStats(true)} />
-      <ModeSelector mode={mode} onSelect={onModeChange} />
+      <GameModeSelector gameMode={gameMode} onSelect={onGameModeChange} />
+      <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
       <View style={styles.boardContainer}>
         <Board
           board={game.board}
-          mode={mode}
+          mode={letterMode}
           revealingRow={game.revealingRow}
           currentRowIndex={game.currentRowIndex}
           cursorPosition={game.cursorPosition}
@@ -55,8 +67,9 @@ function GameScreen({ mode, onModeChange }: { mode: number; onModeChange: (m: nu
         stats={game.stats}
         gameOver={game.gameOver}
         won={game.won}
-        answer={game.dailyWord}
+        answer={game.targetWord}
         shareText={game.shareResult()}
+        gameMode={gameMode}
       />
       <HelpModal visible={showHelp} onClose={() => setShowHelp(false)} />
     </SafeAreaView>
@@ -64,10 +77,19 @@ function GameScreen({ mode, onModeChange }: { mode: number; onModeChange: (m: nu
 }
 
 export default function App() {
-  const [mode, setMode] = useState(5);
+  const [letterMode, setLetterMode] = useState(5);
+  const [gameMode, setGameMode] = useState<GameMode>('daily'); // Default to daily mode
 
-  // key={mode} forces full remount when switching modes
-  return <GameScreen key={mode} mode={mode} onModeChange={setMode} />;
+  // key combines both modes to force full remount when switching
+  return (
+    <GameScreen 
+      key={`${letterMode}-${gameMode}`} 
+      letterMode={letterMode}
+      gameMode={gameMode}
+      onLetterModeChange={setLetterMode}
+      onGameModeChange={setGameMode}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

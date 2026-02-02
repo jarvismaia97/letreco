@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Share, Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { COLORS, MAX_ATTEMPTS } from '../theme';
-import type { GameStats } from '../hooks/useGame';
+import type { GameStats, GameMode } from '../hooks/useGame';
 
 interface Props {
   visible: boolean;
@@ -12,9 +12,10 @@ interface Props {
   won: boolean;
   answer: string;
   shareText: string;
+  gameMode: GameMode;
 }
 
-export default function StatsModal({ visible, onClose, stats, gameOver, won, answer, shareText }: Props) {
+export default function StatsModal({ visible, onClose, stats, gameOver, won, answer, shareText, gameMode }: Props) {
   const winPct = stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0;
   const maxDist = Math.max(...stats.distribution, 1);
 
@@ -48,11 +49,13 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
             {[
               { val: stats.played, label: 'Jogos' },
               { val: winPct, label: '% Vitórias' },
-              { val: stats.currentStreak, label: 'Sequência' },
-              { val: stats.maxStreak, label: 'Melhor Seq.' },
+              { val: stats.currentStreak, label: 'Sequência', emoji: '🔥' },
+              { val: stats.maxStreak, label: 'Melhor Seq.', emoji: '🔥' },
             ].map((s, i) => (
               <View key={i} style={styles.statItem}>
-                <Text style={styles.statVal}>{s.val}</Text>
+                <Text style={styles.statVal}>
+                  {s.emoji && s.val > 0 ? `${s.emoji} ` : ''}{s.val}
+                </Text>
                 <Text style={styles.statLabel}>{s.label}</Text>
               </View>
             ))}
@@ -76,7 +79,7 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
             </View>
           ))}
 
-          {gameOver && (
+          {gameOver && gameMode === 'daily' && (
             <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
               <Text style={styles.shareTxt}>PARTILHAR 📤</Text>
             </TouchableOpacity>
