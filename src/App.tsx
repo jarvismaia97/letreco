@@ -59,9 +59,11 @@ function GameScreen({
   return (
     <div className="min-h-dvh bg-base-100 flex flex-col max-w-lg mx-auto relative w-full">
       <Header />
-      <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
-
-      <SpeedDial
+      <div className="flex items-center justify-center px-2 py-2">
+        <div className="flex-1" />
+        <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
+        <div className="flex-1 flex justify-end pr-1">
+          <SpeedDial
         themeMode={themeMode}
         gameMode={gameMode}
         onHelp={() => setShowHelp(true)}
@@ -74,7 +76,9 @@ function GameScreen({
           setModeToast(next === 'daily' ? '☀️ Modo Palavra do Dia ativado' : '🔄 Modo Treino ativado');
           setTimeout(() => setModeToast(''), 2000);
         }}
-      />
+          />
+        </div>
+      </div>
 
       <div className="flex-1 flex items-center justify-center">
         <Board

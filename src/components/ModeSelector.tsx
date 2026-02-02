@@ -7,7 +7,7 @@ interface Props {
 
 export default function ModeSelector({ mode, onSelect }: Props) {
   return (
-    <div className="flex justify-center gap-2 py-2">
+    <div className="flex justify-center gap-2">
       {MODES.map((m) => (
         <button
           key={m}
