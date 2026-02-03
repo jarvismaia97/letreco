@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MAX_ATTEMPTS } from '../constants';
 import type { GameStats, GameMode } from '../hooks/useGame';
+import { getAccentedWord } from '../data/words';
 
 interface Props {
   visible: boolean;
@@ -69,7 +70,7 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
 
         {gameOver && !won && (
           <p className="text-center font-bold text-[var(--color-present)] mb-3">
-            A palavra era: {answer}
+            A palavra era: {getAccentedWord(answer)}
           </p>
         )}
 

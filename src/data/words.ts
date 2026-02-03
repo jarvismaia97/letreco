@@ -255,3 +255,61 @@ export function getValidWords(mode: number): Set<string> {
     default: return VALID_5;
   }
 }
+
+// ══════════════════════════════════════
+// Accented display forms (normalized → accented)
+// ══════════════════════════════════════
+
+const ACCENTS: Record<string, string> = {
+  // 4 letras
+  'AGUA': 'ÁGUA', 'AREA': 'ÁREA', 'AVOS': 'AVÓS', 'BOIA': 'BÓIA', 'BONE': 'BONÉ',
+  'CACA': 'CAÇA', 'CAFE': 'CAFÉ', 'CHAO': 'CHÃO', 'JOAO': 'JOÃO', 'JOIA': 'JÓIA',
+  'LACO': 'LAÇO', 'MACA': 'MAÇÃ', 'MARE': 'MARÉ', 'ODIO': 'ÓDIO', 'OPIO': 'ÓPIO',
+  'PAIS': 'PAÍS', 'PECA': 'PEÇA', 'POCO': 'POÇO', 'SOFA': 'SOFÁ', 'TACA': 'TAÇA',
+  // 5 letras
+  'ABACO': 'ÁBACO', 'ALIBI': 'ÁLIBI', 'ANEIS': 'ANÉIS', 'AVIAO': 'AVIÃO', 'BRACO': 'BRAÇO',
+  'CALCAS': 'CALÇAS', 'CODIGO': 'CÓDIGO', 'EPOCA': 'ÉPOCA', 'ESPACO': 'ESPAÇO',
+  'FACAO': 'FACÃO', 'FEIJAO': 'FEIJÃO', 'FORCAS': 'FORÇAS', 'GENERO': 'GÉNERO',
+  'HEROIS': 'HERÓIS', 'ILUSAO': 'ILUSÃO', 'INDICE': 'ÍNDICE', 'INGLES': 'INGLÊS',
+  'INTIMO': 'ÍNTIMO', 'LIMAO': 'LIMÃO', 'LIRICO': 'LÍRICO', 'MEDICO': 'MÉDICO',
+  'METODO': 'MÉTODO', 'MIUDO': 'MIÚDO', 'MUSICA': 'MÚSICA', 'NUMERO': 'NÚMERO',
+  'OBVIO': 'ÓBVIO', 'OPTICO': 'ÓPTICO', 'ORBITA': 'ÓRBITA', 'ORGAO': 'ÓRGÃO',
+  'OTIMO': 'ÓTIMO', 'PAGINA': 'PÁGINA', 'PANICO': 'PÂNICO', 'PATRIA': 'PÁTRIA',
+  'PERDAO': 'PERDÃO', 'PORTAO': 'PORTÃO', 'PRATICA': 'PRÁTICA', 'PRECO': 'PREÇO',
+  'PREMIO': 'PRÉMIO', 'RAPIDO': 'RÁPIDO', 'RAZAO': 'RAZÃO', 'REGIAO': 'REGIÃO',
+  'SAIDA': 'SAÍDA', 'SESSAO': 'SESSÃO', 'SOLIDO': 'SÓLIDO', 'SOTAO': 'SÓTÃO',
+  'TECNICA': 'TÉCNICA', 'TITULO': 'TÍTULO', 'TROVAO': 'TROVÃO', 'TUMULO': 'TÚMULO',
+  'UNICO': 'ÚNICO', 'UTEIS': 'ÚTEIS', 'VALIDO': 'VÁLIDO',
+  // 6 letras
+  'ABRACO': 'ABRAÇO', 'ACUCAR': 'AÇÚCAR', 'AMEACA': 'AMEAÇA', 'ANCORA': 'ÂNCORA',
+  'ARVORE': 'ÁRVORE', 'BENCAO': 'BÊNÇÃO', 'CABECA': 'CABEÇA', 'CAMARA': 'CÂMARA',
+  'CAROCO': 'CAROÇO', 'COMECO': 'COMEÇO', 'CORACAO': 'CORAÇÃO', 'DECADA': 'DÉCADA',
+  'DOENCA': 'DOENÇA', 'ESTACAO': 'ESTAÇÃO', 'FABRICA': 'FÁBRICA', 'FAMILIA': 'FAMÍLIA',
+  'FRANCA': 'FRANÇA', 'FUNCAO': 'FUNÇÃO', 'HERANCA': 'HERANÇA', 'JUSTICA': 'JUSTIÇA',
+  'LICENCA': 'LICENÇA', 'LINGUA': 'LÍNGUA', 'LICAO': 'LIÇÃO', 'MAQUINA': 'MÁQUINA',
+  'MEMORIA': 'MEMÓRIA', 'OPINIAO': 'OPINIÃO', 'PALACIO': 'PALÁCIO', 'PASCOA': 'PÁSCOA',
+  'POLICIA': 'POLÍCIA', 'POSICAO': 'POSIÇÃO', 'PRESENCA': 'PRESENÇA', 'PUBLICA': 'PÚBLICA',
+  'PUBLICO': 'PÚBLICO', 'QUESTAO': 'QUESTÃO', 'RAPIDA': 'RÁPIDA', 'RELACAO': 'RELAÇÃO',
+  'SITUACAO': 'SITUAÇÃO', 'SOLUCAO': 'SOLUÇÃO', 'TECNICO': 'TÉCNICO', 'TRADICAO': 'TRADIÇÃO',
+  'VITORIA': 'VITÓRIA',
+  // 7 letras
+  'ABRACAR': 'ABRAÇAR', 'ALIANCA': 'ALIANÇA', 'ALMOCAR': 'ALMOÇAR', 'AMEACAR': 'AMEAÇAR',
+  'ATRACAO': 'ATRAÇÃO', 'ATENCAO': 'ATENÇÃO', 'BALANCA': 'BALANÇA', 'CABECAS': 'CABEÇAS',
+  'CALCOES': 'CALÇÕES', 'CANCAO': 'CANÇÃO', 'CATOLICO': 'CATÓLICO', 'CEREBRO': 'CÉREBRO',
+  'CLASSICO': 'CLÁSSICO', 'COMERCIO': 'COMÉRCIO', 'CONDICAO': 'CONDIÇÃO', 'CONHECA': 'CONHEÇA',
+  'CRIANCA': 'CRIANÇA', 'DECISAO': 'DECISÃO', 'EDIFICIO': 'EDIFÍCIO', 'ELEICAO': 'ELEIÇÃO',
+  'ELETRICO': 'ELÉTRICO', 'EMOCAO': 'EMOÇÃO', 'EXERCICIO': 'EXERCÍCIO', 'EXPLICACAO': 'EXPLICAÇÃO',
+  'FABRICAS': 'FÁBRICAS', 'FRANCES': 'FRANCÊS', 'FUNCOES': 'FUNÇÕES', 'GERACAO': 'GERAÇÃO',
+  'HISTORIA': 'HISTÓRIA', 'INDUSTRIA': 'INDÚSTRIA', 'INTENCAO': 'INTENÇÃO', 'MAQUINAS': 'MÁQUINAS',
+  'MUSICAS': 'MÚSICAS', 'NOTICIAS': 'NOTÍCIAS', 'OPERACAO': 'OPERAÇÃO', 'ORGANIZACAO': 'ORGANIZAÇÃO',
+  'PAGINAS': 'PÁGINAS', 'POPULACAO': 'POPULAÇÃO', 'PRATICAS': 'PRÁTICAS', 'PREVISAO': 'PREVISÃO',
+  'PRODUCAO': 'PRODUÇÃO', 'PROFISSAO': 'PROFISSÃO', 'PROTECAO': 'PROTEÇÃO', 'RAPIDAS': 'RÁPIDAS',
+  'REGIOES': 'REGIÕES', 'RELIGIAO': 'RELIGIÃO', 'REUNIAO': 'REUNIÃO', 'SERVICO': 'SERVIÇO',
+  'SESSOES': 'SESSÕES', 'TECNICAS': 'TÉCNICAS', 'TITULOS': 'TÍTULOS', 'TRANSICAO': 'TRANSIÇÃO'
+};
+
+/** Returns the accented display form of a word, or the original if no accent mapping exists */
+export function getAccentedWord(word: string): string {
+  const upper = word.toUpperCase();
+  return ACCENTS[upper] || upper;
+}
