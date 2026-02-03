@@ -143,6 +143,8 @@ function GameScreen({
         answer={game.targetWord}
         shareText={game.shareResult()}
         gameMode={gameMode}
+        board={game.board}
+        letterMode={letterMode}
       />
       <HelpModal visible={showHelp} onClose={closeHelp} />
       <LeaderboardModal visible={showLeaderboard} onClose={() => setShowLeaderboard(false)} />
