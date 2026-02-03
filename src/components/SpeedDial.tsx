@@ -8,6 +8,7 @@ interface Props {
   onToggleTheme: () => void;
   onStats: () => void;
   onLeaderboard: () => void;
+  onHistory: () => void;
   onToggleGameMode: () => void;
 }
 
@@ -41,6 +42,12 @@ const TrophyIcon = () => (
   </svg>
 );
 
+const HistoryIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
 const GamepadIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -55,6 +62,7 @@ export default function SpeedDial({
   onToggleTheme,
   onStats,
   onLeaderboard,
+  onHistory,
   onToggleGameMode,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -73,13 +81,13 @@ export default function SpeedDial({
     { icon: <HelpIcon />, label: 'Como jogar', action: onHelp },
     { icon: themeMode === 'dark' ? <SunIcon /> : <MoonIcon />, label: themeMode === 'dark' ? 'Tema claro' : 'Tema escuro', action: onToggleTheme, keepOpen: true },
     { icon: <ChartIcon />, label: 'Estatísticas', action: onStats },
-    // { icon: <TrophyIcon />, label: 'Leaderboard', action: onLeaderboard },
+    { icon: <TrophyIcon />, label: 'Leaderboard', action: onLeaderboard },
+    { icon: <HistoryIcon />, label: 'Histórico', action: onHistory },
     { icon: <GamepadIcon />, label: gameMode === 'daily' ? 'Treino' : 'Palavra do Dia', action: onToggleGameMode },
   ];
 
   return (
     <div ref={ref} className="relative z-40">
-      {/* Main FAB */}
       <button
         className="btn btn-circle btn-primary shadow-xl relative z-10 transition-transform duration-200"
         onClick={() => setOpen(!open)}
@@ -97,9 +105,7 @@ export default function SpeedDial({
         </svg>
       </button>
 
-      {/* Flower items - expand downward-left from FAB */}
       {items.map((item, i) => {
-        // Spread items in an arc going down-left
         const angle = Math.PI * 0.5 + (i / (items.length - 1)) * Math.PI * 0.55;
         const radius = 65;
         const x = Math.cos(angle) * radius;
