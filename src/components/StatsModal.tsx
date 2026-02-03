@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { MAX_ATTEMPTS } from '../constants';
 import type { GameStats, GameMode } from '../hooks/useGame';
 
@@ -13,25 +14,47 @@ interface Props {
 }
 
 export default function StatsModal({ visible, onClose, stats, gameOver, won, answer, shareText, gameMode }: Props) {
+  const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
   if (!visible) return null;
 
   const winPct = stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0;
   const maxDist = Math.max(...stats.distribution, 1);
 
-  const handleShare = async () => {
+  const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(shareText);
-      alert('Resultado copiado!');
+      await navigator.clipboard.writeText(text);
+      return true;
     } catch {
-      // fallback
       const ta = document.createElement('textarea');
-      ta.value = shareText;
+      ta.value = text;
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      alert('Resultado copiado!');
+      return true;
     }
+  };
+
+  const handleCopyResult = async () => {
+    await copyToClipboard(shareText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyLink = async () => {
+    await copyToClipboard('https://letreco.app');
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const handleWhatsApp = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+  };
+
+  const handleTwitter = () => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, '_blank');
   };
 
   return (
@@ -88,12 +111,34 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
         </div>
 
         {gameOver && gameMode === 'daily' && (
-          <button
-            className="btn w-full bg-[var(--color-correct)] hover:bg-[var(--color-correct)] text-white font-bold text-base tracking-wide border-none"
-            onClick={handleShare}
-          >
-            PARTILHAR 📤
-          </button>
+          <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                className="btn bg-[var(--color-correct)] hover:bg-[var(--color-correct)]/90 text-white font-bold border-none"
+                onClick={handleCopyResult}
+              >
+                {copied ? '✅ Copiado!' : '📋 Copiar resultado'}
+              </button>
+              <button
+                className="btn bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold border-none"
+                onClick={handleWhatsApp}
+              >
+                💬 WhatsApp
+              </button>
+              <button
+                className="btn bg-[#1DA1F2] hover:bg-[#1DA1F2]/90 text-white font-bold border-none"
+                onClick={handleTwitter}
+              >
+                🐦 X / Twitter
+              </button>
+              <button
+                className="btn bg-base-300 hover:bg-base-300/90 text-base-content font-bold border-none"
+                onClick={handleCopyLink}
+              >
+                {linkCopied ? '✅ Copiado!' : '🔗 Copiar link'}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
