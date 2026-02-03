@@ -128,6 +128,7 @@ function GameScreen({
           revealingRow={game.revealingRow}
           currentRowIndex={game.currentRowIndex}
           cursorPosition={game.cursorPosition}
+          won={game.won}
           onTilePress={(col) => game.setCursorPosition(col)}
         />
       </div>

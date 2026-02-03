@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MAX_ATTEMPTS } from '../constants';
 import type { GameStats, GameMode } from '../hooks/useGame';
 import { getAccentedWord } from '../data/words';
+import { getDefinition } from '../data/definitions';
 
 interface Props {
   visible: boolean;
@@ -68,10 +69,24 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
           ✕
         </button>
 
-        {gameOver && !won && (
-          <p className="text-center font-bold text-[var(--color-present)] mb-3">
-            A palavra era: {getAccentedWord(answer)}
-          </p>
+        {gameOver && (
+          <div className="text-center mb-4">
+            {!won && (
+              <p className="font-bold text-[var(--color-present)] mb-1">
+                A palavra era: {getAccentedWord(answer)}
+              </p>
+            )}
+            {won && (
+              <p className="font-bold text-[var(--color-correct)] mb-1">
+                🎉 {getAccentedWord(answer)}
+              </p>
+            )}
+            {getDefinition(answer) && (
+              <p className="text-sm text-base-content/70 italic">
+                "{getDefinition(answer)}"
+              </p>
+            )}
+          </div>
         )}
 
         <h2 className="text-center font-bold text-sm tracking-widest mb-3">ESTATÍSTICAS</h2>

@@ -7,6 +7,7 @@ interface Props {
   size: number;
   delay?: number;
   revealing?: boolean;
+  won?: boolean;
   isCursor?: boolean;
   onPress?: () => void;
 }
@@ -20,9 +21,10 @@ function bgClass(state: LetterState): string {
   }
 }
 
-export default function Tile({ letter, state, size, delay = 0, revealing, isCursor, onPress }: Props) {
+export default function Tile({ letter, state, size, delay = 0, revealing, won, isCursor, onPress }: Props) {
   const [flipped, setFlipped] = useState(false);
   const [pop, setPop] = useState(false);
+  const [bounce, setBounce] = useState(false);
   const prevState = useRef(state);
 
   useEffect(() => {
@@ -41,6 +43,13 @@ export default function Tile({ letter, state, size, delay = 0, revealing, isCurs
     }
     prevState.current = state;
   }, [letter, state]);
+
+  useEffect(() => {
+    if (won && flipped) {
+      const timer = setTimeout(() => setBounce(true), delay + 300);
+      return () => clearTimeout(timer);
+    }
+  }, [won, flipped, delay]);
 
   const isRevealed = state === 'correct' || state === 'present' || state === 'absent';
   const showBg = isRevealed && (!revealing || flipped);
@@ -61,6 +70,7 @@ export default function Tile({ letter, state, size, delay = 0, revealing, isCurs
         ${showBg ? bgClass(state) : ''}
         ${revealing && flipped ? 'animate-flip' : ''}
         ${pop ? 'animate-pop' : ''}
+        ${bounce ? 'animate-bounce-win' : ''}
         ${onPress ? 'cursor-pointer' : ''}
       `}
       style={{

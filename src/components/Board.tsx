@@ -8,10 +8,11 @@ interface Props {
   revealingRow: number;
   currentRowIndex: number;
   cursorPosition: number;
+  won?: boolean;
   onTilePress: (col: number) => void;
 }
 
-export default function Board({ board, mode, revealingRow, currentRowIndex, cursorPosition, onTilePress }: Props) {
+export default function Board({ board, mode, revealingRow, currentRowIndex, cursorPosition, won, onTilePress }: Props) {
   const availableHeight = window.innerHeight - 350;
   const availableWidth = window.innerWidth - 20;
   const gap = 5;
@@ -32,6 +33,7 @@ export default function Board({ board, mode, revealingRow, currentRowIndex, curs
               size={tileSize}
               delay={colIdx * 250}
               revealing={rowIdx === revealingRow}
+              won={won && rowIdx === revealingRow}
               isCursor={rowIdx === currentRowIndex && colIdx === cursorPosition}
               onPress={rowIdx === currentRowIndex ? () => onTilePress(colIdx) : undefined}
             />

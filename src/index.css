@@ -20,21 +20,27 @@
 }
 
 @keyframes flip-in {
-  0% { transform: scaleY(1); }
-  50% { transform: scaleY(0); }
-  100% { transform: scaleY(1); }
+  0% { 
+    transform: perspective(400px) rotateX(0deg);
+  }
+  50% { 
+    transform: perspective(400px) rotateX(90deg);
+  }
+  100% { 
+    transform: perspective(400px) rotateX(0deg);
+  }
 }
 
 @keyframes pop {
   0% { transform: scale(1); }
-  50% { transform: scale(1.12); }
+  50% { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-4px); }
-  40%, 80% { transform: translateX(4px); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
 @keyframes toast-in {
@@ -42,20 +48,43 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes bounce {
+  0%, 20% { transform: translateY(0); }
+  40% { transform: translateY(-20px); }
+  50% { transform: translateY(0); }
+  60% { transform: translateY(-10px); }
+  80% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes pulse-win {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
 .animate-flip {
   animation: flip-in 0.5s ease-in-out;
+  transform-style: preserve-3d;
 }
 
 .animate-pop {
-  animation: pop 0.1s ease-in-out;
+  animation: pop 0.12s ease-in-out;
 }
 
 .animate-shake {
-  animation: shake 0.3s ease-in-out;
+  animation: shake 0.4s ease-in-out;
 }
 
 .animate-toast {
   animation: toast-in 0.2s ease-out;
+}
+
+.animate-bounce-win {
+  animation: bounce 0.8s ease-in-out;
+}
+
+.animate-pulse-win {
+  animation: pulse-win 0.5s ease-in-out 2;
 }
 
 /* Prevent overscroll/bounce on iOS */
