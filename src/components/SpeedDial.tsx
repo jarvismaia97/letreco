@@ -8,7 +8,7 @@ interface Props {
   onToggleTheme: () => void;
   onStats: () => void;
   onLeaderboard: () => void;
-  onHistory: () => void;
+  onHistory?: () => void;
   onToggleGameMode: () => void;
 }
 
@@ -82,7 +82,7 @@ export default function SpeedDial({
     { icon: themeMode === 'dark' ? <SunIcon /> : <MoonIcon />, label: themeMode === 'dark' ? 'Tema claro' : 'Tema escuro', action: onToggleTheme, keepOpen: true },
     { icon: <ChartIcon />, label: 'Estatísticas', action: onStats },
     { icon: <TrophyIcon />, label: 'Leaderboard', action: onLeaderboard },
-    { icon: <HistoryIcon />, label: 'Histórico', action: onHistory },
+    // { icon: <HistoryIcon />, label: 'Histórico', action: onHistory },
     { icon: <GamepadIcon />, label: gameMode === 'daily' ? 'Treino' : 'Palavra do Dia', action: onToggleGameMode },
   ];
 
