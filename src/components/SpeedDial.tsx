@@ -109,8 +109,8 @@ export default function SpeedDial({
       {/* Flower items - expand downward-left from FAB */}
       {items.map((item, i) => {
         // Spread items in an arc going down-left
-        const angle = Math.PI * 0.5 + (i / (items.length - 1)) * Math.PI * 0.55;
-        const radius = 65;
+        const angle = Math.PI * 0.4 + (i / (items.length - 1)) * Math.PI * 0.7;
+        const radius = 75;
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
 
