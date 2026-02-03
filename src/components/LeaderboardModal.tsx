@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X, Trophy, Flame } from 'lucide-react';
 import { MAX_ATTEMPTS } from '../constants';
 import type { GameStats } from '../hooks/useGame';
 import { fetchLeaderboard, getPlayerId, type LeaderboardEntry } from '../lib/auth';
@@ -101,8 +102,8 @@ function LocalStatsView() {
               <div className="text-xs text-base-content/70 space-y-0.5">
                 <div className="flex justify-between"><span>Jogos</span><span>{stats.played}</span></div>
                 <div className="flex justify-between"><span>Vitórias</span><span>{wp}%</span></div>
-                <div className="flex justify-between"><span>Sequência</span><span>🔥 {stats.currentStreak}</span></div>
-                <div className="flex justify-between"><span>Melhor</span><span>🔥 {stats.maxStreak}</span></div>
+                <div className="flex justify-between"><span>Sequência</span><span className="flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500" /> {stats.currentStreak}</span></div>
+                <div className="flex justify-between"><span>Melhor</span><span className="flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500" /> {stats.maxStreak}</span></div>
               </div>
             </div>
           );
@@ -218,10 +219,12 @@ export default function LeaderboardModal({ visible, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <button className="btn btn-ghost btn-sm btn-circle absolute top-3 right-3" onClick={onClose}>
-          ✕
+          <X className="w-5 h-5" />
         </button>
 
-        <h2 className="text-center font-bold text-sm tracking-widest mb-3">🏆 LEADERBOARD</h2>
+        <h2 className="text-center font-bold text-sm tracking-widest mb-3 flex items-center justify-center gap-2">
+          <Trophy className="w-5 h-5" /> LEADERBOARD
+        </h2>
 
         {isOnline ? <OnlineLeaderboardView /> : <LocalStatsView />}
 
