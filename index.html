@@ -1,13 +1,55 @@
 <!DOCTYPE html>
-<html lang="pt" data-theme="dark">
+<html lang="pt-PT" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#121213" />
-  <meta name="description" content="Letreco - Jogo de palavras em Português" />
+
+  <!-- SEO Meta Tags -->
+  <title>Letreco - Jogo de Palavras em Português | Wordle PT</title>
+  <meta name="description" content="Joga Letreco, o Wordle em Português! Adivinha a palavra do dia em 6 tentativas. Modos de 4, 5, 6 e 7 letras. Joga grátis no browser!" />
+  <meta name="keywords" content="letreco, wordle português, jogo de palavras, palavra do dia, wordle pt" />
+  <link rel="canonical" href="https://letreco-app-alpha.vercel.app" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Letreco - Jogo de Palavras em Português | Wordle PT" />
+  <meta property="og:description" content="Joga Letreco, o Wordle em Português! Adivinha a palavra do dia em 6 tentativas. Modos de 4, 5, 6 e 7 letras. Joga grátis no browser!" />
+  <meta property="og:image" content="https://letreco-app-alpha.vercel.app/letreco-logo.png" />
+  <meta property="og:url" content="https://letreco-app-alpha.vercel.app" />
+  <meta property="og:locale" content="pt_PT" />
+  <meta property="og:site_name" content="Letreco" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Letreco - Jogo de Palavras em Português | Wordle PT" />
+  <meta name="twitter:description" content="Joga Letreco, o Wordle em Português! Adivinha a palavra do dia em 6 tentativas. Modos de 4, 5, 6 e 7 letras. Joga grátis no browser!" />
+  <meta name="twitter:image" content="https://letreco-app-alpha.vercel.app/letreco-logo.png" />
+
+  <!-- Favicons & PWA -->
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/icon.png" />
-  <title>Letreco</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Letreco",
+    "url": "https://letreco-app-alpha.vercel.app",
+    "description": "Joga Letreco, o Wordle em Português! Adivinha a palavra do dia em 6 tentativas. Modos de 4, 5, 6 e 7 letras. Joga grátis no browser!",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "inLanguage": "pt-PT",
+    "image": "https://letreco-app-alpha.vercel.app/letreco-logo.png"
+  }
+  </script>
 </head>
 <body class="bg-base-100 min-h-dvh">
   <div id="root"></div>

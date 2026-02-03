@@ -1,0 +1,22 @@
+{
+  "name": "Letreco - Jogo de Palavras em Português",
+  "short_name": "Letreco",
+  "description": "Joga Letreco, o Wordle em Português! Adivinha a palavra do dia em 6 tentativas. Modos de 4, 5, 6 e 7 letras. Joga grátis no browser!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121213",
+  "theme_color": "#121213",
+  "lang": "pt-PT",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
