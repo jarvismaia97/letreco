@@ -8,7 +8,7 @@ interface Props {
   onToggleTheme: () => void;
   onStats: () => void;
   onLeaderboard: () => void;
-  onHistory?: () => void;
+  onHistory: () => void;
   onToggleGameMode: () => void;
 }
 
@@ -82,12 +82,13 @@ export default function SpeedDial({
     { icon: themeMode === 'dark' ? <SunIcon /> : <MoonIcon />, label: themeMode === 'dark' ? 'Tema claro' : 'Tema escuro', action: onToggleTheme, keepOpen: true },
     { icon: <ChartIcon />, label: 'Estatísticas', action: onStats },
     { icon: <TrophyIcon />, label: 'Leaderboard', action: onLeaderboard },
-    // { icon: <HistoryIcon />, label: 'Histórico', action: onHistory },
+    { icon: <HistoryIcon />, label: 'Histórico', action: onHistory },
     { icon: <GamepadIcon />, label: gameMode === 'daily' ? 'Treino' : 'Palavra do Dia', action: onToggleGameMode },
   ];
 
   return (
     <div ref={ref} className="relative z-40">
+      {/* Main FAB */}
       <button
         className="btn btn-circle btn-primary shadow-xl relative z-10 transition-transform duration-200"
         onClick={() => setOpen(!open)}
@@ -105,7 +106,9 @@ export default function SpeedDial({
         </svg>
       </button>
 
+      {/* Flower items - expand downward-left from FAB */}
       {items.map((item, i) => {
+        // Spread items in an arc going down-left
         const angle = Math.PI * 0.5 + (i / (items.length - 1)) * Math.PI * 0.55;
         const radius = 65;
         const x = Math.cos(angle) * radius;

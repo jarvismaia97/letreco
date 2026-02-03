@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react';
 import { MAX_ATTEMPTS } from '../constants';
 import type { GameStats } from '../hooks/useGame';
+import { fetchLeaderboard, getPlayerId, type LeaderboardEntry } from '../lib/auth';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 interface Props {
   visible: boolean;
@@ -32,7 +35,7 @@ function aggregate(allStats: GameStats[]): GameStats {
     agg.currentStreak += s.currentStreak;
     agg.maxStreak = Math.max(agg.maxStreak, s.maxStreak);
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
-      agg.distribution[i] += (s.distribution[i] || 0);
+      agg.distribution[i] += s.distribution[i] || 0;
     }
   }
   return agg;
@@ -69,12 +72,144 @@ function DistributionChart({ distribution }: { distribution: number[] }) {
   );
 }
 
-export default function LeaderboardModal({ visible, onClose }: Props) {
-  if (!visible) return null;
-
+function LocalStatsView() {
   const allStats = MODES.map((m) => ({ mode: m, stats: loadStats(m) }));
   const total = aggregate(allStats.map((s) => s.stats));
   const winPct = total.played > 0 ? Math.round((total.wins / total.played) * 100) : 0;
+
+  return (
+    <>
+      <div className="flex justify-around mb-4">
+        <StatCard val={total.played} label="Jogos" />
+        <StatCard val={`${winPct}%`} label="Vitórias" />
+        <StatCard val={total.currentStreak} label="Sequência" />
+        <StatCard val={total.maxStreak} label="Melhor Seq." />
+      </div>
+
+      <h3 className="text-center font-bold text-xs tracking-widest mb-2">DISTRIBUIÇÃO TOTAL</h3>
+      <DistributionChart distribution={total.distribution} />
+
+      <div className="divider my-4" />
+      <h3 className="text-center font-bold text-xs tracking-widest mb-3">POR MODO</h3>
+
+      <div className="grid grid-cols-2 gap-3">
+        {allStats.map(({ mode, stats }) => {
+          const wp = stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0;
+          return (
+            <div key={mode} className="bg-base-300 rounded-lg p-3">
+              <div className="font-bold text-center mb-1">{mode} letras</div>
+              <div className="text-xs text-base-content/70 space-y-0.5">
+                <div className="flex justify-between"><span>Jogos</span><span>{stats.played}</span></div>
+                <div className="flex justify-between"><span>Vitórias</span><span>{wp}%</span></div>
+                <div className="flex justify-between"><span>Sequência</span><span>🔥 {stats.currentStreak}</span></div>
+                <div className="flex justify-between"><span>Melhor</span><span>🔥 {stats.maxStreak}</span></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function OnlineLeaderboardView() {
+  const [selectedMode, setSelectedMode] = useState(5);
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [playerRank, setPlayerRank] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const playerId = getPlayerId();
+
+  useEffect(() => {
+    setLoading(true);
+    fetchLeaderboard(selectedMode)
+      .then(({ entries, playerRank }) => {
+        setEntries(entries);
+        setPlayerRank(playerRank);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [selectedMode]);
+
+  return (
+    <>
+      {/* Mode tabs */}
+      <div className="flex justify-center gap-2 mb-4">
+        {MODES.map((m) => (
+          <button
+            key={m}
+            className={`btn btn-xs ${selectedMode === m ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setSelectedMode(m)}
+          >
+            {m} letras
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="text-center py-8">
+          <span className="loading loading-spinner loading-md" />
+        </div>
+      ) : entries.length === 0 ? (
+        <p className="text-center text-sm text-base-content/60 py-8">
+          Ainda não há jogadores suficientes neste modo.
+          <br />
+          Jogue pelo menos 3 partidas para aparecer!
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {entries.map((entry, idx) => {
+            const isCurrentPlayer = playerId && entry.id === playerId;
+            const rank = idx + 1;
+            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+            
+            return (
+              <div
+                key={entry.id}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${
+                  isCurrentPlayer ? 'bg-primary/20 ring-1 ring-primary' : 'bg-base-300'
+                }`}
+              >
+                <span className="w-8 text-center font-bold">
+                  {medal || `#${rank}`}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold truncate">
+                    {entry.display_name}
+                    {isCurrentPlayer && <span className="ml-1 text-xs opacity-60">(você)</span>}
+                  </div>
+                  <div className="text-xs text-base-content/60">
+                    {entry.games_played} jogos
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-success">{entry.win_rate}%</div>
+                  <div className="text-xs text-base-content/60">
+                    ~{entry.avg_attempts || '-'} tent.
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {playerRank && playerRank > 20 && (
+        <p className="text-center text-sm text-base-content/60 mt-4">
+          Você está em #{playerRank} lugar
+        </p>
+      )}
+
+      <div className="divider my-4" />
+      <h3 className="text-center font-bold text-xs tracking-widest mb-3">SUAS ESTATÍSTICAS LOCAIS</h3>
+      <LocalStatsView />
+    </>
+  );
+}
+
+export default function LeaderboardModal({ visible, onClose }: Props) {
+  if (!visible) return null;
+
+  const isOnline = isSupabaseConfigured();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={onClose}>
@@ -88,37 +223,13 @@ export default function LeaderboardModal({ visible, onClose }: Props) {
 
         <h2 className="text-center font-bold text-sm tracking-widest mb-3">🏆 LEADERBOARD</h2>
 
-        {/* Totals */}
-        <div className="flex justify-around mb-4">
-          <StatCard val={total.played} label="Jogos" />
-          <StatCard val={`${winPct}%`} label="Vitórias" />
-          <StatCard val={total.currentStreak} label="Sequência" />
-          <StatCard val={total.maxStreak} label="Melhor Seq." />
-        </div>
+        {isOnline ? <OnlineLeaderboardView /> : <LocalStatsView />}
 
-        <h3 className="text-center font-bold text-xs tracking-widest mb-2">DISTRIBUIÇÃO TOTAL</h3>
-        <DistributionChart distribution={total.distribution} />
-
-        {/* Per-mode breakdown */}
-        <div className="divider my-4" />
-        <h3 className="text-center font-bold text-xs tracking-widest mb-3">POR MODO</h3>
-
-        <div className="grid grid-cols-2 gap-3">
-          {allStats.map(({ mode, stats }) => {
-            const wp = stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0;
-            return (
-              <div key={mode} className="bg-base-300 rounded-lg p-3">
-                <div className="font-bold text-center mb-1">{mode} letras</div>
-                <div className="text-xs text-base-content/70 space-y-0.5">
-                  <div className="flex justify-between"><span>Jogos</span><span>{stats.played}</span></div>
-                  <div className="flex justify-between"><span>Vitórias</span><span>{wp}%</span></div>
-                  <div className="flex justify-between"><span>Sequência</span><span>🔥 {stats.currentStreak}</span></div>
-                  <div className="flex justify-between"><span>Melhor</span><span>🔥 {stats.maxStreak}</span></div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {!isOnline && (
+          <p className="text-center text-xs text-base-content/40 mt-4">
+            Conecte ao Supabase para ver o leaderboard global
+          </p>
+        )}
       </div>
     </div>
   );
