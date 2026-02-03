@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, BarChart3, History, Play, Settings } from 'lucide-react';
+import { Sun, Moon, BarChart3, History, Play, Settings, User } from 'lucide-react';
 import type { GameMode } from '../hooks/useGame';
+import { getDisplayName } from '../lib/auth';
 
 interface Props {
   themeMode: 'dark' | 'light';
@@ -31,7 +32,10 @@ export default function SpeedDial({
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
+  const displayName = getDisplayName();
+
   const items = [
+    { icon: <User className="w-5 h-5" />, label: displayName || 'Jogador', action: () => {}, isInfo: true },
     { icon: themeMode === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />, label: themeMode === 'dark' ? 'Tema claro' : 'Tema escuro', action: onToggleTheme, keepOpen: true },
     { icon: <BarChart3 className="w-5 h-5" />, label: 'Estatísticas', action: onStats },
     { icon: <History className="w-5 h-5" />, label: 'Histórico', action: onHistory },
@@ -53,12 +57,12 @@ export default function SpeedDial({
       {items.map((item, i) => {
         // Stack items vertically below FAB
         const y = (i + 1) * 48;
+        const isInfo = 'isInfo' in item && item.isInfo;
 
         return (
           <div
             key={i}
-            className="absolute top-2 right-2 tooltip tooltip-left"
-            data-tip={item.label}
+            className="absolute top-2 right-2 flex items-center gap-2"
             style={{
               transform: open
                 ? `translate(0, ${y}px) scale(1)`
@@ -67,12 +71,24 @@ export default function SpeedDial({
               transition: `all 250ms cubic-bezier(0.34, 1.56, 0.64, 1) ${open ? i * 50 : 0}ms`,
             }}
           >
+            {isInfo && (
+              <span className="bg-base-200 px-3 py-1 rounded-full text-xs font-medium text-base-content shadow-lg whitespace-nowrap">
+                {item.label}
+              </span>
+            )}
             <button
-              className="btn btn-circle btn-sm bg-base-200 hover:bg-base-300 border-base-300 shadow-lg text-base-content"
+              className={`btn btn-circle btn-sm shadow-lg ${
+                isInfo 
+                  ? 'bg-primary text-primary-content border-primary cursor-default' 
+                  : 'bg-base-200 hover:bg-base-300 border-base-300 text-base-content'
+              }`}
               onClick={() => {
-                item.action();
-                if (!item.keepOpen) setOpen(false);
+                if (!isInfo) {
+                  item.action();
+                  if (!('keepOpen' in item && item.keepOpen)) setOpen(false);
+                }
               }}
+              {...(!isInfo && { 'data-tip': item.label })}
             >
               {item.icon}
             </button>

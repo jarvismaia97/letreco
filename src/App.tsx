@@ -130,7 +130,7 @@ function GameScreen({
           onTilePress={(col) => game.setCursorPosition(col)}
         />
       </div>
-      <Toast message={game.toastMessage || modeToast} />
+      <Toast message={modeToast || game.toastMessage} />
       <Keyboard onKeyPress={game.onKeyPress} keyColors={game.keyboardColors()} />
       <StatsModal
         visible={game.showStats}
