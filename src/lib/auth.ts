@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import type { GameStats } from '../hooks/useGame';
+import type { User } from '@supabase/supabase-js';
 import { MAX_ATTEMPTS } from '../constants';
 
 const ANON_ID_KEY = 'letreco_anon_id';
@@ -53,9 +54,126 @@ export function getDisplayName(): string | null {
   return localStorage.getItem(DISPLAY_NAME_KEY);
 }
 
+// ============ Google Auth Functions ============
+
+export async function signInWithGoogle(): Promise<{ error: Error | null }> {
+  if (!isSupabaseConfigured() || !supabase) {
+    return { error: new Error('Supabase not configured') };
+  }
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin,
+    },
+  });
+
+  return { error: error ? new Error(error.message) : null };
+}
+
+export async function signOut(): Promise<void> {
+  if (!isSupabaseConfigured() || !supabase) return;
+  
+  await supabase.auth.signOut();
+  // Keep anonymous ID for local stats, but clear player link
+  localStorage.removeItem(PLAYER_ID_KEY);
+  localStorage.removeItem(DISPLAY_NAME_KEY);
+  localStorage.removeItem(MIGRATED_KEY);
+}
+
+export async function getCurrentUser(): Promise<User | null> {
+  if (!isSupabaseConfigured() || !supabase) return null;
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+}
+
+export function onAuthStateChange(callback: (user: User | null) => void): () => void {
+  if (!isSupabaseConfigured() || !supabase) {
+    return () => {};
+  }
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    callback(session?.user ?? null);
+  });
+
+  return () => subscription.unsubscribe();
+}
+
+// ============ Player Management ============
+
 export async function ensurePlayer(): Promise<string | null> {
   if (!isSupabaseConfigured() || !supabase) return null;
 
+  // Check if user is logged in with Google
+  const user = await getCurrentUser();
+  
+  if (user) {
+    // User is authenticated - find or create player linked to their account
+    const { data: existing } = await supabase
+      .from('players')
+      .select('id, display_name')
+      .eq('user_id', user.id)
+      .single();
+
+    if (existing) {
+      localStorage.setItem(PLAYER_ID_KEY, existing.id);
+      localStorage.setItem(DISPLAY_NAME_KEY, existing.display_name);
+      return existing.id;
+    }
+
+    // Check if there's an anonymous player to link
+    const anonId = getAnonId();
+    const { data: anonPlayer } = await supabase
+      .from('players')
+      .select('id, display_name')
+      .eq('anonymous_id', anonId)
+      .is('user_id', null)
+      .single();
+
+    if (anonPlayer) {
+      // Link anonymous player to Google account
+      const displayName = user.user_metadata?.name || user.email?.split('@')[0] || anonPlayer.display_name;
+      await supabase
+        .from('players')
+        .update({ 
+          user_id: user.id, 
+          display_name: displayName,
+          email: user.email,
+          avatar_url: user.user_metadata?.avatar_url || null,
+        })
+        .eq('id', anonPlayer.id);
+      
+      localStorage.setItem(PLAYER_ID_KEY, anonPlayer.id);
+      localStorage.setItem(DISPLAY_NAME_KEY, displayName);
+      return anonPlayer.id;
+    }
+
+    // Create new player linked to Google account
+    const displayName = user.user_metadata?.name || user.email?.split('@')[0] || generateDisplayName();
+    const { data: created, error } = await supabase
+      .from('players')
+      .insert({ 
+        user_id: user.id,
+        anonymous_id: anonId,
+        display_name: displayName,
+        email: user.email,
+        avatar_url: user.user_metadata?.avatar_url || null,
+      })
+      .select('id, display_name')
+      .single();
+
+    if (error || !created) {
+      console.error('Failed to create player:', error);
+      return null;
+    }
+
+    localStorage.setItem(PLAYER_ID_KEY, created.id);
+    localStorage.setItem(DISPLAY_NAME_KEY, created.display_name);
+    return created.id;
+  }
+
+  // Anonymous user flow (existing logic)
   const existingId = getPlayerId();
   if (existingId) return existingId;
 
@@ -180,6 +298,7 @@ export async function saveGameResult(params: {
 export interface LeaderboardEntry {
   id: string;
   display_name: string;
+  avatar_url?: string | null;
   games_played: number;
   games_won: number;
   win_rate: number;
@@ -253,4 +372,22 @@ export async function fetchGameHistory(params: {
   if (error || !data) return [];
 
   return data as GameHistoryRecord[];
+}
+
+export async function updateDisplayName(newName: string): Promise<boolean> {
+  if (!isSupabaseConfigured() || !supabase) return false;
+  
+  const playerId = getPlayerId();
+  if (!playerId) return false;
+
+  const { error } = await supabase
+    .from('players')
+    .update({ display_name: newName })
+    .eq('id', playerId);
+
+  if (!error) {
+    localStorage.setItem(DISPLAY_NAME_KEY, newName);
+    return true;
+  }
+  return false;
 }
