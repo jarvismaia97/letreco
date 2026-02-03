@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, BarChart3, History, Play, Plus } from 'lucide-react';
+import { Sun, Moon, BarChart3, History, Play, Settings } from 'lucide-react';
 import type { GameMode } from '../hooks/useGame';
 
 interface Props {
@@ -39,23 +39,20 @@ export default function SpeedDial({
   ];
 
   return (
-    <div ref={ref} className="fixed bottom-24 right-4 z-40">
+    <div ref={ref} className="fixed top-20 right-4 z-40">
       {/* Main FAB */}
       <button
         className="btn btn-circle btn-primary shadow-xl relative z-10 transition-transform duration-200"
         onClick={() => setOpen(!open)}
         aria-label="Menu"
       >
-        <Plus className={`w-6 h-6 transition-transform duration-200 ${open ? 'rotate-45' : ''}`} />
+        <Settings className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-90' : ''}`} />
       </button>
 
-      {/* Flower items - expand downward-left from FAB */}
+      {/* Flower items - expand downward from FAB */}
       {items.map((item, i) => {
-        // Spread items in an arc going down-left
-        const angle = Math.PI * 0.5 + (i / (items.length - 1)) * Math.PI * 0.5;
-        const radius = 60;
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
+        // Stack items vertically below FAB
+        const y = (i + 1) * 48;
 
         return (
           <div
@@ -64,7 +61,7 @@ export default function SpeedDial({
             data-tip={item.label}
             style={{
               transform: open
-                ? `translate(${x}px, ${y}px) scale(1)`
+                ? `translate(0, ${y}px) scale(1)`
                 : 'translate(0, 0) scale(0)',
               opacity: open ? 1 : 0,
               transition: `all 250ms cubic-bezier(0.34, 1.56, 0.64, 1) ${open ? i * 50 : 0}ms`,
