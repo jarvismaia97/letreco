@@ -268,7 +268,7 @@ export function useGame(letterMode: number, gameMode: GameMode = 'daily') {
     const today = new Date();
     const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
 
-    return `Letreco ${dayNumber} (${letterMode} letras) ${result} ⭐\n${dateStr}\n\n${grid}\n\nhttps://letreco.openclaw.ai`;
+    return `Letreco ${dayNumber} (${letterMode} letras) ${result} ⭐\n${dateStr}\n\n${grid}\n\nhttps://letreco.app`;
   }, [guesses, won, dayNumber, letterMode, gameMode]);
 
   const board: TileData[][] = [];
