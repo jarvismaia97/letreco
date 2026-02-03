@@ -102,24 +102,22 @@ function GameScreen({
     <div className="min-h-dvh bg-base-100 flex flex-col max-w-lg mx-auto relative w-full overflow-x-hidden">
       <Header onHelp={() => setShowHelp(true)} onLeaderboard={() => setShowLeaderboard(true)} />
       <div className="flex items-center justify-center px-2 py-2">
-        <div className="flex-1" />
         <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
-        <div className="flex-1 flex justify-end pr-1">
-          <SpeedDial
-            themeMode={themeMode}
-            gameMode={gameMode}
-            onToggleTheme={toggleTheme}
-            onStats={() => game.setShowStats(true)}
-            onHistory={() => setShowHistory(true)}
-            onToggleGameMode={() => {
-              const next = gameMode === 'daily' ? 'practice' : 'daily';
-              onGameModeChange(next);
-              setModeToast(next === 'daily' ? '☀️ Modo Palavra do Dia ativado' : '🔄 Modo Treino ativado');
-              setTimeout(() => setModeToast(''), 2000);
-            }}
-          />
-        </div>
       </div>
+
+      <SpeedDial
+        themeMode={themeMode}
+        gameMode={gameMode}
+        onToggleTheme={toggleTheme}
+        onStats={() => game.setShowStats(true)}
+        onHistory={() => setShowHistory(true)}
+        onToggleGameMode={() => {
+          const next = gameMode === 'daily' ? 'practice' : 'daily';
+          onGameModeChange(next);
+          setModeToast(next === 'daily' ? '☀️ Modo Palavra do Dia ativado' : '🔄 Modo Treino ativado');
+          setTimeout(() => setModeToast(''), 2000);
+        }}
+      />
 
       <div className="flex-1 flex items-center justify-center">
         <Board

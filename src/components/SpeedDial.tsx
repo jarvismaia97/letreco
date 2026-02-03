@@ -69,7 +69,7 @@ export default function SpeedDial({
   ];
 
   return (
-    <div ref={ref} className="relative z-40">
+    <div ref={ref} className="fixed bottom-24 right-4 z-40">
       {/* Main FAB */}
       <button
         className="btn btn-circle btn-primary shadow-xl relative z-10 transition-transform duration-200"
