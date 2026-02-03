@@ -99,7 +99,7 @@ function GameScreen({
   }
 
   return (
-    <div className="min-h-dvh bg-base-100 flex flex-col max-w-lg mx-auto relative w-full">
+    <div className="min-h-dvh bg-base-100 flex flex-col max-w-lg mx-auto relative w-full overflow-x-hidden">
       <Header onHelp={() => setShowHelp(true)} onLeaderboard={() => setShowLeaderboard(true)} />
       <div className="flex items-center justify-center px-2 py-2">
         <div className="flex-1" />
