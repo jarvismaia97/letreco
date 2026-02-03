@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, BarChart3, History, Play, Settings, User } from 'lucide-react';
+import { Sun, Moon, BarChart3, History, Play, Settings, User, LogIn } from 'lucide-react';
 import type { GameMode } from '../hooks/useGame';
-import { getDisplayName } from '../lib/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Props {
   themeMode: 'dark' | 'light';
@@ -10,6 +10,7 @@ interface Props {
   onStats: () => void;
   onHistory: () => void;
   onToggleGameMode: () => void;
+  onLogin: () => void;
 }
 
 export default function SpeedDial({
@@ -19,9 +20,11 @@ export default function SpeedDial({
   onStats,
   onHistory,
   onToggleGameMode,
+  onLogin,
 }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (!open) return;
@@ -32,10 +35,15 @@ export default function SpeedDial({
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  const displayName = getDisplayName();
+  const displayName = user?.displayName || 'Jogador';
 
   const items = [
-    { icon: <User className="w-5 h-5" />, label: displayName || 'Jogador', action: () => {}, isInfo: true },
+    { 
+      icon: isAuthenticated ? <User className="w-5 h-5" /> : <LogIn className="w-5 h-5" />, 
+      label: isAuthenticated ? displayName : 'Entrar', 
+      action: onLogin, 
+      isInfo: isAuthenticated 
+    },
     { icon: themeMode === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />, label: themeMode === 'dark' ? 'Tema claro' : 'Tema escuro', action: onToggleTheme, keepOpen: true },
     { icon: <BarChart3 className="w-5 h-5" />, label: 'Estatísticas', action: onStats },
     { icon: <History className="w-5 h-5" />, label: 'Histórico', action: onHistory },

@@ -8,9 +8,11 @@ import StatsModal from './components/StatsModal';
 import HelpModal from './components/HelpModal';
 import LeaderboardModal from './components/LeaderboardModal';
 import HistoryModal from './components/HistoryModal';
+import LoginModal from './components/LoginModal';
 import SpeedDial from './components/SpeedDial';
 import { useGame, type GameMode } from './hooks/useGame';
 import { useTheme } from './hooks/useTheme';
+import { AuthProvider } from './contexts/AuthContext';
 import { ensurePlayer, migrateLocalStats, saveGameResult } from './lib/auth';
 import { isSupabaseConfigured } from './lib/supabase';
 
@@ -31,6 +33,7 @@ function GameScreen({
   const game = useGame(letterMode, gameMode);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [modeToast, setModeToast] = useState('');
   const gameResultSavedRef = useRef(false);
 
@@ -111,6 +114,7 @@ function GameScreen({
         onToggleTheme={toggleTheme}
         onStats={() => game.setShowStats(true)}
         onHistory={() => setShowHistory(true)}
+        onLogin={() => setShowLogin(true)}
         onToggleGameMode={() => {
           const next = gameMode === 'daily' ? 'practice' : 'daily';
           onGameModeChange(next);
@@ -149,6 +153,7 @@ function GameScreen({
       <HelpModal visible={showHelp} onClose={closeHelp} />
       <LeaderboardModal visible={showLeaderboard} onClose={() => setShowLeaderboard(false)} />
       <HistoryModal visible={showHistory} onClose={() => setShowHistory(false)} />
+      <LoginModal visible={showLogin} onClose={() => setShowLogin(false)} />
     </div>
   );
 }
@@ -158,12 +163,14 @@ export default function App() {
   const [gameMode, setGameMode] = useState<GameMode>('daily');
 
   return (
-    <GameScreen
-      key={`${letterMode}-${gameMode}`}
-      letterMode={letterMode}
-      gameMode={gameMode}
-      onLetterModeChange={setLetterMode}
-      onGameModeChange={setGameMode}
-    />
+    <AuthProvider>
+      <GameScreen
+        key={`${letterMode}-${gameMode}`}
+        letterMode={letterMode}
+        gameMode={gameMode}
+        onLetterModeChange={setLetterMode}
+        onGameModeChange={setGameMode}
+      />
+    </AuthProvider>
   );
 }
