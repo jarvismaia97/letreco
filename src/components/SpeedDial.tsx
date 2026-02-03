@@ -4,19 +4,11 @@ import type { GameMode } from '../hooks/useGame';
 interface Props {
   themeMode: 'dark' | 'light';
   gameMode: GameMode;
-  onHelp: () => void;
   onToggleTheme: () => void;
   onStats: () => void;
-  onLeaderboard: () => void;
   onHistory: () => void;
   onToggleGameMode: () => void;
 }
-
-const HelpIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
 
 const SunIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -36,12 +28,6 @@ const ChartIcon = () => (
   </svg>
 );
 
-const TrophyIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M5 3h14M5 3v4a7 7 0 007 7m-7-11H2m3 0h14m0 0h3m-3 0v4a7 7 0 01-7 7m0 0v4m0-4h-4m4 0h4m-8 4h8" />
-  </svg>
-);
-
 const HistoryIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -58,10 +44,8 @@ const GamepadIcon = () => (
 export default function SpeedDial({
   themeMode,
   gameMode,
-  onHelp,
   onToggleTheme,
   onStats,
-  onLeaderboard,
   onHistory,
   onToggleGameMode,
 }: Props) {
@@ -78,10 +62,8 @@ export default function SpeedDial({
   }, [open]);
 
   const items = [
-    { icon: <HelpIcon />, label: 'Como jogar', action: onHelp },
     { icon: themeMode === 'dark' ? <SunIcon /> : <MoonIcon />, label: themeMode === 'dark' ? 'Tema claro' : 'Tema escuro', action: onToggleTheme, keepOpen: true },
     { icon: <ChartIcon />, label: 'Estatísticas', action: onStats },
-    { icon: <TrophyIcon />, label: 'Leaderboard', action: onLeaderboard },
     { icon: <HistoryIcon />, label: 'Histórico', action: onHistory },
     { icon: <GamepadIcon />, label: gameMode === 'daily' ? 'Treino' : 'Palavra do Dia', action: onToggleGameMode },
   ];
@@ -109,8 +91,8 @@ export default function SpeedDial({
       {/* Flower items - expand downward-left from FAB */}
       {items.map((item, i) => {
         // Spread items in an arc going down-left
-        const angle = Math.PI * 0.4 + (i / (items.length - 1)) * Math.PI * 0.7;
-        const radius = 75;
+        const angle = Math.PI * 0.5 + (i / (items.length - 1)) * Math.PI * 0.5;
+        const radius = 60;
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
 
