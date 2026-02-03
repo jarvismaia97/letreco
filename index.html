@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#121213" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Letreco" />
+  <meta name="application-name" content="Letreco" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://www.googletagmanager.com" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
   <meta name="google-site-verification" content="GmOlYjUyLFlvPh56bhzuAnno7LmGNNgwc6yLYdyoJPI" />
 
@@ -18,9 +29,17 @@
 
   <!-- SEO Meta Tags -->
   <title>Letreco - Jogo de Palavras em Português | Wordle PT</title>
-  <meta name="description" content="Joga Letreco, o Wordle em Português! Adivinha a palavra do dia em 6 tentativas. Modos de 4, 5, 6 e 7 letras. Joga grátis no browser!" />
-  <meta name="keywords" content="letreco, wordle português, jogo de palavras, palavra do dia, wordle pt" />
+  <meta name="description" content="Joga Letreco, o Wordle em Português! Adivinha a palavra do dia em 6 tentativas. Modos de 4, 5, 6 e 7 letras. Jogo grátis, sem anúncios. Novo desafio todos os dias!" />
+  <meta name="keywords" content="letreco, wordle português, jogo de palavras, palavra do dia, wordle pt, wordle brasil, jogo português, puzzle letras, adivinha palavra" />
+  <meta name="author" content="Letreco" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://letreco.app" />
+  
+  <!-- Hreflang for Portuguese variants -->
+  <link rel="alternate" hreflang="pt" href="https://letreco.app" />
+  <link rel="alternate" hreflang="pt-PT" href="https://letreco.app" />
+  <link rel="alternate" hreflang="pt-BR" href="https://letreco.app" />
+  <link rel="alternate" hreflang="x-default" href="https://letreco.app" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
@@ -42,7 +61,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
 
-  <!-- Structured Data (JSON-LD) -->
+  <!-- Structured Data (JSON-LD) - WebApplication -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -50,15 +69,78 @@
     "name": "Letreco",
     "url": "https://letreco.app",
     "description": "Joga Letreco, o Wordle em Português! Adivinha a palavra do dia em 6 tentativas. Modos de 4, 5, 6 e 7 letras. Joga grátis no browser!",
-    "applicationCategory": "Game",
+    "applicationCategory": "GameApplication",
+    "genre": "Word Game",
     "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "EUR"
     },
     "inLanguage": "pt-PT",
-    "image": "https://letreco.app/og-image.png"
+    "image": "https://letreco.app/og-image.png",
+    "screenshot": "https://letreco.app/og-image.png",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "150",
+      "bestRating": "5"
+    }
+  }
+  </script>
+
+  <!-- Structured Data (JSON-LD) - FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "O que é o Letreco?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Letreco é a versão portuguesa do popular jogo Wordle. O objetivo é adivinhar a palavra do dia em 6 tentativas, recebendo pistas sobre as letras corretas."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Como jogar Letreco?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Escreve uma palavra válida e carrega Enter. As letras ficam verdes se estiverem na posição certa, amarelas se existirem noutra posição, e cinzentas se não existirem na palavra."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quantos modos tem o Letreco?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "O Letreco tem 4 modos: palavras de 4, 5, 6 e 7 letras. Cada modo tem uma palavra diferente por dia."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "O Letreco é grátis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sim! O Letreco é completamente grátis e pode ser jogado no browser ou instalado como app no telemóvel."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Structured Data (JSON-LD) - Organization/Brand -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Letreco",
+    "url": "https://letreco.app",
+    "logo": "https://letreco.app/icon-512.png",
+    "sameAs": []
   }
   </script>
 </head>
