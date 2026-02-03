@@ -33,6 +33,25 @@ const DEFINITIONS: Record<string, string> = {
   'VELA': 'Cilindro de cera com pavio para iluminar',
   'VIDA': 'Estado de existência dos seres vivos',
   'ZERO': 'Número que representa a ausência de quantidade',
+  // Novas palavras comuns
+  'GATO': 'Felino doméstico de estimação',
+  'PATO': 'Ave aquática de bico largo',
+  'RATO': 'Roedor pequeno de cauda longa',
+  'BOLO': 'Massa doce assada no forno',
+  'RODA': 'Peça circular que gira em torno de um eixo',
+  'COLA': 'Substância adesiva; bebida gaseificada',
+  'BOCA': 'Abertura por onde se come e fala',
+  'ROSA': 'Flor aromática de pétalas delicadas',
+  'NOTA': 'Apontamento; grau de avaliação',
+  'MAPA': 'Representação gráfica de um território',
+  'SUMO': 'Líquido extraído de frutas',
+  'SINO': 'Instrumento metálico que produz som',
+  'NETO': 'Filho de um filho ou filha',
+  'URSO': 'Mamífero grande e peludo',
+  'ANEL': 'Joia em forma de círculo para o dedo',
+  'FACA': 'Utensílio cortante com lâmina e cabo',
+  'SAPO': 'Anfíbio de pele rugosa',
+  'LEAO': 'Grande felino conhecido como rei da selva',
   
   // 5 letras
   'ABACO': 'Instrumento antigo de cálculo',
@@ -54,6 +73,27 @@ const DEFINITIONS: Record<string, string> = {
   'TITULO': 'Nome de obra; distinção honorífica',
   'UNICO': 'Que é o único; singular',
   'DESEJO': 'Vontade intensa de ter ou fazer algo',
+  // Novas palavras comuns
+  'PEDRA': 'Fragmento de rocha; mineral sólido',
+  'PAPEL': 'Material fino para escrever',
+  'PRATO': 'Recipiente para servir comida',
+  'PORTA': 'Abertura de entrada ou saída',
+  'PRAIA': 'Faixa de areia junto ao mar',
+  'NOITE': 'Período entre o pôr e nascer do sol',
+  'CARTA': 'Mensagem escrita; naipe de baralho',
+  'TERRA': 'Solo; planeta onde vivemos',
+  'MUNDO': 'Conjunto de todos os seres e coisas',
+  'CARRO': 'Veículo de quatro rodas',
+  'PLANO': 'Projeto; superfície sem ondulações',
+  'BANCO': 'Assento; instituição financeira',
+  'LARGO': 'Amplo; praça pública',
+  'ROUPA': 'Vestuário; peças de vestir',
+  'TEMPO': 'Duração dos eventos; clima',
+  'LUGAR': 'Espaço ocupado por algo ou alguém',
+  'FESTA': 'Celebração; comemoração',
+  'METRO': 'Unidade de medida; transporte subterrâneo',
+  'CARNE': 'Tecido muscular comestível',
+  'TINTA': 'Substância líquida colorida',
   
   // 6 letras
   'ABRACO': 'Gesto de afeto com os braços',
@@ -75,6 +115,25 @@ const DEFINITIONS: Record<string, string> = {
   'REGIAO': 'Área geográfica definida',
   'SESSAO': 'Período de uma atividade',
   'VITORIA': 'Triunfo; sucesso em competição',
+  // Novas palavras comuns
+  'CIDADE': 'Área urbana com muitos habitantes',
+  'ESCOLA': 'Estabelecimento de ensino',
+  'BANANA': 'Fruta tropical amarela e alongada',
+  'BRASIL': 'País da América do Sul',
+  'JANELA': 'Abertura na parede para luz e ar',
+  'COMIDA': 'Alimento; refeição',
+  'AMANHA': 'O dia seguinte ao de hoje',
+  'QUARTO': 'Divisão de uma casa para dormir',
+  'CHEGAR': 'Atingir um destino',
+  'GRANDE': 'De tamanho considerável',
+  'SEMPRE': 'Em todo o tempo; constantemente',
+  'PESSOA': 'Ser humano; indivíduo',
+  'BONITO': 'Que tem beleza; agradável à vista',
+  'MELHOR': 'Superior em qualidade',
+  'PASSAR': 'Atravessar; transcorrer',
+  'PENSAR': 'Usar a mente para raciocinar',
+  'MENINO': 'Criança do sexo masculino',
+  'MENINA': 'Criança do sexo feminino',
   
   // 7 letras
   'ABRACAR': 'Envolver com os braços em gesto de afeto',
@@ -98,7 +157,17 @@ const DEFINITIONS: Record<string, string> = {
   'RELIGIAO': 'Sistema de crenças e práticas espirituais',
   'REUNIAO': 'Encontro de pessoas; assembleia',
   'SERVICO': 'Trabalho prestado a outrem',
-  'TRADICAO': 'Costume transmitido entre gerações'
+  'TRADICAO': 'Costume transmitido entre gerações',
+  // Novas palavras comuns
+  'PESSOAS': 'Plural de pessoa; seres humanos',
+  'MOMENTO': 'Instante; período breve de tempo',
+  'GOVERNO': 'Conjunto de autoridades que dirigem um país',
+  'EMPRESA': 'Organização comercial ou industrial',
+  'EXEMPLO': 'Modelo; caso que serve de referência',
+  'CAMINHO': 'Via; percurso entre dois pontos',
+  'PALAVRA': 'Unidade de linguagem com significado',
+  'MUSICAL': 'Relativo à música; espetáculo cantado',
+  'DESTINO': 'Lugar para onde se vai; sina'
 };
 
 /** Returns the definition of a word, or undefined if not found */
