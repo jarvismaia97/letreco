@@ -82,7 +82,13 @@ export default function Tile({ letter, state, size, delay = 0, revealing, won, i
       }}
       onClick={onPress}
     >
-      <span className="text-white">{letter}</span>
+      <span className={
+        showBg 
+          ? state === 'absent' 
+            ? 'text-black dark:text-white' 
+            : 'text-white'
+          : 'text-base-content'
+      }>{letter}</span>
     </div>
   );
 }
