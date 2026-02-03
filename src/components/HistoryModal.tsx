@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X, ScrollText, Sun, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { fetchGameHistory } from '../lib/auth';
 import { isSupabaseConfigured } from '../lib/supabase';
 
@@ -51,9 +52,11 @@ export default function HistoryModal({ visible, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <button className="btn btn-ghost btn-sm btn-circle absolute top-3 right-3" onClick={onClose}>
-          ✕
+          <X className="w-5 h-5" />
         </button>
-        <h2 className="text-center font-bold text-sm tracking-widest mb-3">📜 HISTÓRICO</h2>
+        <h2 className="text-center font-bold text-sm tracking-widest mb-3 flex items-center justify-center gap-2">
+          <ScrollText className="w-4 h-4" /> HISTÓRICO
+        </h2>
         {!isOnline ? (
           <p className="text-center text-sm text-base-content/60 py-4">
             Conecte ao Supabase para ver o histórico online.
@@ -73,8 +76,8 @@ export default function HistoryModal({ visible, onClose }: Props) {
             </div>
             <div className="flex justify-center gap-2 mb-4">
               <button className={`btn btn-xs ${modeFilter === '' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setModeFilter('')}>Todos</button>
-              <button className={`btn btn-xs ${modeFilter === 'daily' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setModeFilter('daily')}>☀️ Diário</button>
-              <button className={`btn btn-xs ${modeFilter === 'practice' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setModeFilter('practice')}>🔄 Treino</button>
+              <button className={`btn btn-xs gap-1 ${modeFilter === 'daily' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setModeFilter('daily')}><Sun className="w-3 h-3" /> Diário</button>
+              <button className={`btn btn-xs gap-1 ${modeFilter === 'practice' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setModeFilter('practice')}><RefreshCw className="w-3 h-3" /> Treino</button>
             </div>
             {loading ? (
               <div className="text-center py-4"><span className="loading loading-spinner loading-sm" /></div>
@@ -90,11 +93,11 @@ export default function HistoryModal({ visible, onClose }: Props) {
                       key={game.id}
                       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${game.won ? 'bg-success/10' : 'bg-error/10'}`}
                     >
-                      <span className="text-lg">{game.won ? '✅' : '❌'}</span>
+                      {game.won ? <CheckCircle className="w-5 h-5 text-success" /> : <XCircle className="w-5 h-5 text-error" />}
                       <div className="flex-1">
                         <div className="font-bold uppercase">{game.word}</div>
-                        <div className="text-xs text-base-content/60">
-                          {dateStr} · {game.letter_mode} letras · {game.game_mode === 'daily' ? '☀️' : '🔄'}
+                        <div className="text-xs text-base-content/60 flex items-center gap-1">
+                          {dateStr} · {game.letter_mode} letras · {game.game_mode === 'daily' ? <Sun className="w-3 h-3" /> : <RefreshCw className="w-3 h-3" />}
                         </div>
                       </div>
                       <div className="text-right">

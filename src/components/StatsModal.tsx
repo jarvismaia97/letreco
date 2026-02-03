@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { X, Flame, PartyPopper, Copy, Check, MessageCircle, Link, Twitter } from 'lucide-react';
 import { MAX_ATTEMPTS } from '../constants';
 import type { GameStats, GameMode } from '../hooks/useGame';
 import { getAccentedWord } from '../data/words';
@@ -66,7 +67,7 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
         onClick={(e) => e.stopPropagation()}
       >
         <button className="btn btn-ghost btn-sm btn-circle absolute top-3 right-3" onClick={onClose}>
-          ✕
+          <X className="w-5 h-5" />
         </button>
 
         {gameOver && (
@@ -77,8 +78,8 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
               </p>
             )}
             {won && (
-              <p className="font-bold text-[var(--color-correct)] mb-1">
-                🎉 {getAccentedWord(answer)}
+              <p className="font-bold text-[var(--color-correct)] mb-1 flex items-center justify-center gap-2">
+                <PartyPopper className="w-5 h-5" /> {getAccentedWord(answer)}
               </p>
             )}
             {getDefinition(answer) && (
@@ -93,14 +94,15 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
 
         <div className="flex justify-around mb-4">
           {[
-            { val: stats.played, label: 'Jogos' },
-            { val: winPct, label: '% Vitórias' },
-            { val: stats.currentStreak, label: 'Sequência', emoji: '🔥' },
-            { val: stats.maxStreak, label: 'Melhor Seq.', emoji: '🔥' },
+            { val: stats.played, label: 'Jogos', hasFlame: false },
+            { val: winPct, label: '% Vitórias', hasFlame: false },
+            { val: stats.currentStreak, label: 'Sequência', hasFlame: true },
+            { val: stats.maxStreak, label: 'Melhor Seq.', hasFlame: true },
           ].map((s, i) => (
             <div key={i} className="text-center">
-              <div className="text-2xl font-bold">
-                {s.emoji && s.val > 0 ? `${s.emoji} ` : ''}{s.val}
+              <div className="text-2xl font-bold flex items-center justify-center gap-1">
+                {s.hasFlame && s.val > 0 && <Flame className="w-5 h-5 text-orange-500" />}
+                {s.val}
               </div>
               <div className="text-xs text-base-content/60">{s.label}</div>
             </div>
@@ -130,28 +132,28 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
               <button
-                className="btn bg-[var(--color-correct)] hover:bg-[var(--color-correct)]/90 text-white font-bold border-none"
+                className="btn bg-[var(--color-correct)] hover:bg-[var(--color-correct)]/90 text-white font-bold border-none gap-2"
                 onClick={handleCopyResult}
               >
-                {copied ? '✅ Copiado!' : '📋 Copiar resultado'}
+                {copied ? <><Check className="w-4 h-4" /> Copiado!</> : <><Copy className="w-4 h-4" /> Copiar</>}
               </button>
               <button
-                className="btn bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold border-none"
+                className="btn bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold border-none gap-2"
                 onClick={handleWhatsApp}
               >
-                💬 WhatsApp
+                <MessageCircle className="w-4 h-4" /> WhatsApp
               </button>
               <button
-                className="btn bg-[#1DA1F2] hover:bg-[#1DA1F2]/90 text-white font-bold border-none"
+                className="btn bg-[#1DA1F2] hover:bg-[#1DA1F2]/90 text-white font-bold border-none gap-2"
                 onClick={handleTwitter}
               >
-                🐦 X / Twitter
+                <Twitter className="w-4 h-4" /> X / Twitter
               </button>
               <button
-                className="btn bg-base-300 hover:bg-base-300/90 text-base-content font-bold border-none"
+                className="btn bg-base-300 hover:bg-base-300/90 text-base-content font-bold border-none gap-2"
                 onClick={handleCopyLink}
               >
-                {linkCopied ? '✅ Copiado!' : '🔗 Copiar link'}
+                {linkCopied ? <><Check className="w-4 h-4" /> Copiado!</> : <><Link className="w-4 h-4" /> Link</>}
               </button>
             </div>
           </div>
