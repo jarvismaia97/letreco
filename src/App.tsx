@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
 import ModeSelector from './components/ModeSelector';
 import Board from './components/Board';
@@ -7,9 +7,12 @@ import Toast from './components/Toast';
 import StatsModal from './components/StatsModal';
 import HelpModal from './components/HelpModal';
 import LeaderboardModal from './components/LeaderboardModal';
+import HistoryModal from './components/HistoryModal';
 import SpeedDial from './components/SpeedDial';
 import { useGame, type GameMode } from './hooks/useGame';
 import { useTheme } from './hooks/useTheme';
+import { ensurePlayer, migrateLocalStats, saveGameResult } from './lib/auth';
+import { isSupabaseConfigured } from './lib/supabase';
 
 const HELP_SEEN_KEY = 'letreco_help_seen';
 
@@ -27,7 +30,9 @@ function GameScreen({
   const { themeMode, toggleTheme } = useTheme();
   const game = useGame(letterMode, gameMode);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [modeToast, setModeToast] = useState('');
+  const gameResultSavedRef = useRef(false);
 
   const [showHelp, setShowHelp] = useState(() => {
     return !localStorage.getItem(HELP_SEEN_KEY);
@@ -37,6 +42,43 @@ function GameScreen({
     setShowHelp(false);
     localStorage.setItem(HELP_SEEN_KEY, '1');
   };
+
+  // Initialize player on mount
+  useEffect(() => {
+    if (isSupabaseConfigured()) {
+      ensurePlayer().then(() => {
+        migrateLocalStats();
+      });
+    }
+  }, []);
+
+  // Save game result when game ends
+  useEffect(() => {
+    if (game.gameOver && !gameResultSavedRef.current && isSupabaseConfigured()) {
+      gameResultSavedRef.current = true;
+      
+      // Get daily date for daily mode
+      const today = new Date();
+      const dailyDate = gameMode === 'daily' 
+        ? `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+        : undefined;
+
+      saveGameResult({
+        letterMode,
+        gameMode,
+        word: game.targetWord,
+        attempts: game.currentRowIndex + 1,
+        won: game.won,
+        board: game.board,
+        dailyDate,
+      });
+    }
+  }, [game.gameOver, game.won, game.targetWord, game.currentRowIndex, game.board, letterMode, gameMode]);
+
+  // Reset saved flag when game changes
+  useEffect(() => {
+    gameResultSavedRef.current = false;
+  }, [letterMode, gameMode]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -64,18 +106,19 @@ function GameScreen({
         <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
         <div className="flex-1 flex justify-end pr-1">
           <SpeedDial
-        themeMode={themeMode}
-        gameMode={gameMode}
-        onHelp={() => setShowHelp(true)}
-        onToggleTheme={toggleTheme}
-        onStats={() => game.setShowStats(true)}
-        onLeaderboard={() => setShowLeaderboard(true)}
-        onToggleGameMode={() => {
-          const next = gameMode === 'daily' ? 'practice' : 'daily';
-          onGameModeChange(next);
-          setModeToast(next === 'daily' ? '☀️ Modo Palavra do Dia ativado' : '🔄 Modo Treino ativado');
-          setTimeout(() => setModeToast(''), 2000);
-        }}
+            themeMode={themeMode}
+            gameMode={gameMode}
+            onHelp={() => setShowHelp(true)}
+            onToggleTheme={toggleTheme}
+            onStats={() => game.setShowStats(true)}
+            onLeaderboard={() => setShowLeaderboard(true)}
+            onHistory={() => setShowHistory(true)}
+            onToggleGameMode={() => {
+              const next = gameMode === 'daily' ? 'practice' : 'daily';
+              onGameModeChange(next);
+              setModeToast(next === 'daily' ? '☀️ Modo Palavra do Dia ativado' : '🔄 Modo Treino ativado');
+              setTimeout(() => setModeToast(''), 2000);
+            }}
           />
         </div>
       </div>
@@ -104,6 +147,7 @@ function GameScreen({
       />
       <HelpModal visible={showHelp} onClose={closeHelp} />
       <LeaderboardModal visible={showLeaderboard} onClose={() => setShowLeaderboard(false)} />
+      <HistoryModal visible={showHistory} onClose={() => setShowHistory(false)} />
     </div>
   );
 }
