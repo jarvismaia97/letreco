@@ -43,7 +43,7 @@ export default function SpeedDial({
   ];
 
   return (
-    <div ref={ref} className="fixed top-20 right-4 z-40">
+    <div ref={ref} className="relative z-40">
       {/* Main FAB */}
       <button
         className="btn btn-circle btn-primary shadow-xl relative z-10 transition-transform duration-200"
@@ -62,7 +62,7 @@ export default function SpeedDial({
         return (
           <div
             key={i}
-            className="absolute top-2 right-2 flex items-center gap-2"
+            className="absolute top-0 right-0 flex items-center gap-2"
             style={{
               transform: open
                 ? `translate(0, ${y}px) scale(1)`

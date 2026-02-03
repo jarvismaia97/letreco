@@ -101,11 +101,10 @@ function GameScreen({
   return (
     <div className="min-h-dvh bg-base-100 flex flex-col max-w-lg mx-auto relative w-full overflow-x-hidden">
       <Header onHelp={() => setShowHelp(true)} onLeaderboard={() => setShowLeaderboard(true)} />
-      <div className="flex items-center justify-center px-2 py-2">
+      <div className="flex items-center justify-between px-4 py-2">
+        <div className="w-10" /> {/* Spacer for balance */}
         <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
-      </div>
-
-      <SpeedDial
+        <SpeedDial
         themeMode={themeMode}
         gameMode={gameMode}
         onToggleTheme={toggleTheme}
@@ -118,6 +117,7 @@ function GameScreen({
           setTimeout(() => setModeToast(''), 2000);
         }}
       />
+      </div>
 
       <div className="flex-1 flex items-center justify-center">
         <Board
