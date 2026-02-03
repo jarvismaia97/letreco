@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Flame, PartyPopper, Copy, Check, MessageCircle, Link, Twitter } from 'lucide-react';
+import { X, Flame, PartyPopper, Check, MessageCircle, Link, Twitter, Instagram, Share2 } from 'lucide-react';
 import { MAX_ATTEMPTS } from '../constants';
 import type { GameStats, GameMode } from '../hooks/useGame';
 import { getAccentedWord } from '../data/words';
@@ -40,10 +40,23 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
     }
   };
 
-  const handleCopyResult = async () => {
-    await copyToClipboard(shareText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Letreco',
+          text: shareText,
+          url: 'https://letreco.app',
+        });
+      } catch {
+        // User cancelled or share failed
+      }
+    } else {
+      // Fallback: copy to clipboard
+      await copyToClipboard(shareText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleCopyLink = async () => {
@@ -132,16 +145,16 @@ export default function StatsModal({ visible, onClose, stats, gameOver, won, ans
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
               <button
-                className="btn bg-[var(--color-correct)] hover:bg-[var(--color-correct)]/90 text-white font-bold border-none gap-2"
-                onClick={handleCopyResult}
-              >
-                {copied ? <><Check className="w-4 h-4" /> Copiado!</> : <><Copy className="w-4 h-4" /> Copiar</>}
-              </button>
-              <button
                 className="btn bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold border-none gap-2"
                 onClick={handleWhatsApp}
               >
                 <MessageCircle className="w-4 h-4" /> WhatsApp
+              </button>
+              <button
+                className="btn bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 text-white font-bold border-none gap-2"
+                onClick={handleShare}
+              >
+                <Instagram className="w-4 h-4" /> Instagram
               </button>
               <button
                 className="btn bg-[#1DA1F2] hover:bg-[#1DA1F2]/90 text-white font-bold border-none gap-2"
