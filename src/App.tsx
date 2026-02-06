@@ -112,27 +112,29 @@ function GameScreen({
 
   return (
     <div className="min-h-dvh bg-base-100 flex flex-col max-w-lg mx-auto relative w-full overflow-x-hidden">
-      <Header onHelp={() => setShowHelp(true)} onLeaderboard={() => setShowLeaderboard(true)} />
-      <div className="flex items-center justify-between px-4 py-2 gap-3">
-        <div className="w-10 flex-shrink-0" /> {/* Spacer for balance */}
-        <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
-        <div className="flex-shrink-0">
+      <Header 
+        onHelp={() => setShowHelp(true)} 
+        onLeaderboard={() => setShowLeaderboard(true)}
+        rightElement={
           <SpeedDial
-        themeMode={themeMode}
-        gameMode={gameMode}
-        onToggleTheme={toggleTheme}
-        onStats={() => game.setShowStats(true)}
-        onHistory={() => setShowHistory(true)}
-        onLogin={() => isAuthenticated ? setShowProfile(true) : setShowLogin(true)}
-        onGroups={() => setShowGroups(true)}
-        onToggleGameMode={() => {
-          const next = gameMode === 'daily' ? 'practice' : 'daily';
-          onGameModeChange(next);
-          setModeToast(next === 'daily' ? '☀️ Modo Palavra do Dia ativado' : '🔄 Modo Treino ativado');
-          setTimeout(() => setModeToast(''), 2000);
-        }}
+            themeMode={themeMode}
+            gameMode={gameMode}
+            onToggleTheme={toggleTheme}
+            onStats={() => game.setShowStats(true)}
+            onHistory={() => setShowHistory(true)}
+            onLogin={() => isAuthenticated ? setShowProfile(true) : setShowLogin(true)}
+            onGroups={() => setShowGroups(true)}
+            onToggleGameMode={() => {
+              const next = gameMode === 'daily' ? 'practice' : 'daily';
+              onGameModeChange(next);
+              setModeToast(next === 'daily' ? '☀️ Modo Palavra do Dia ativado' : '🔄 Modo Treino ativado');
+              setTimeout(() => setModeToast(''), 2000);
+            }}
+          />
+        }
       />
-        </div>
+      <div className="flex items-center justify-center px-4 py-2">
+        <ModeSelector mode={letterMode} onSelect={onLetterModeChange} />
       </div>
 
       <div className="flex-1 flex items-center justify-center">
