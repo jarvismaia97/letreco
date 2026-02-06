@@ -10,6 +10,8 @@ import LeaderboardModal from './components/LeaderboardModal';
 import HistoryModal from './components/HistoryModal';
 import LoginModal from './components/LoginModal';
 import SpeedDial from './components/SpeedDial';
+import GroupsModal from './components/GroupsModal';
+import GroupLeaderboardModal from './components/GroupLeaderboardModal';
 import { useGame, type GameMode } from './hooks/useGame';
 import { useTheme } from './hooks/useTheme';
 import { AuthProvider } from './contexts/AuthContext';
@@ -34,6 +36,9 @@ function GameScreen({
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showGroups, setShowGroups] = useState(false);
+  const [showGroupLeaderboard, setShowGroupLeaderboard] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [modeToast, setModeToast] = useState('');
   const gameResultSavedRef = useRef(false);
 
@@ -115,6 +120,7 @@ function GameScreen({
         onStats={() => game.setShowStats(true)}
         onHistory={() => setShowHistory(true)}
         onLogin={() => setShowLogin(true)}
+        onGroups={() => setShowGroups(true)}
         onToggleGameMode={() => {
           const next = gameMode === 'daily' ? 'practice' : 'daily';
           onGameModeChange(next);
@@ -154,6 +160,26 @@ function GameScreen({
       <LeaderboardModal visible={showLeaderboard} onClose={() => setShowLeaderboard(false)} />
       <HistoryModal visible={showHistory} onClose={() => setShowHistory(false)} />
       <LoginModal visible={showLogin} onClose={() => setShowLogin(false)} />
+      <GroupsModal 
+        visible={showGroups} 
+        onClose={() => setShowGroups(false)} 
+        onSelectGroup={(groupId) => {
+          setSelectedGroupId(groupId);
+          setShowGroups(false);
+          setShowGroupLeaderboard(true);
+        }}
+        letterMode={letterMode}
+      />
+      <GroupLeaderboardModal
+        visible={showGroupLeaderboard}
+        onClose={() => setShowGroupLeaderboard(false)}
+        onBack={() => {
+          setShowGroupLeaderboard(false);
+          setShowGroups(true);
+        }}
+        groupId={selectedGroupId || ''}
+        letterMode={letterMode}
+      />
     </div>
   );
 }

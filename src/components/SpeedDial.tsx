@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, BarChart3, History, Play, Settings, User, LogIn } from 'lucide-react';
+import { Sun, Moon, BarChart3, History, Play, Settings, User, LogIn, Users } from 'lucide-react';
 import type { GameMode } from '../hooks/useGame';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -11,6 +11,7 @@ interface Props {
   onHistory: () => void;
   onToggleGameMode: () => void;
   onLogin: () => void;
+  onGroups: () => void;
 }
 
 export default function SpeedDial({
@@ -21,6 +22,7 @@ export default function SpeedDial({
   onHistory,
   onToggleGameMode,
   onLogin,
+  onGroups,
 }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -44,6 +46,7 @@ export default function SpeedDial({
       action: onLogin, 
       isInfo: isAuthenticated 
     },
+    { icon: <Users className="w-5 h-5" />, label: 'Grupos', action: onGroups },
     { icon: themeMode === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />, label: themeMode === 'dark' ? 'Tema claro' : 'Tema escuro', action: onToggleTheme, keepOpen: true },
     { icon: <BarChart3 className="w-5 h-5" />, label: 'Estatísticas', action: onStats },
     { icon: <History className="w-5 h-5" />, label: 'Histórico', action: onHistory },
