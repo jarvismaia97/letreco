@@ -9,7 +9,7 @@ interface Props {
 
 export default function Header({ onHelp, onLeaderboard, rightElement }: Props) {
   return (
-    <header className="flex items-center justify-between px-2 sm:px-4 py-2 border-b border-base-300 w-full max-w-full overflow-hidden">
+    <header className="flex items-center justify-between px-2 sm:px-4 py-2 border-b border-base-300 w-full max-w-full overflow-visible">
       <div className="flex items-center gap-1 flex-shrink-0">
         <button
           className="btn btn-circle btn-ghost btn-sm"
