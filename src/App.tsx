@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
 import Header from './components/Header';
 import ModeSelector from './components/ModeSelector';
 import Board from './components/Board';
@@ -91,6 +92,36 @@ function GameScreen({
   useEffect(() => {
     gameResultSavedRef.current = false;
   }, [letterMode, gameMode]);
+
+  // Confetti on win!
+  useEffect(() => {
+    if (game.won && game.gameOver) {
+      const duration = 3000;
+      const end = Date.now() + duration;
+
+      const frame = () => {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#6aaa64', '#c9b458', '#787c7e'],
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#6aaa64', '#c9b458', '#787c7e'],
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      };
+      frame();
+    }
+  }, [game.won, game.gameOver]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
