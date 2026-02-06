@@ -12,9 +12,11 @@ import LoginModal from './components/LoginModal';
 import SpeedDial from './components/SpeedDial';
 import GroupsModal from './components/GroupsModal';
 import GroupLeaderboardModal from './components/GroupLeaderboardModal';
+import ProfileModal from './components/ProfileModal';
 import { useGame, type GameMode } from './hooks/useGame';
 import { useTheme } from './hooks/useTheme';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { signOut } from './lib/auth';
 import { ensurePlayer, migrateLocalStats, saveGameResult } from './lib/auth';
 import { isSupabaseConfigured } from './lib/supabase';
 
@@ -32,6 +34,7 @@ function GameScreen({
   onGameModeChange: (m: GameMode) => void;
 }) {
   const { themeMode, toggleTheme } = useTheme();
+  const { isAuthenticated } = useAuth();
   const game = useGame(letterMode, gameMode);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -39,6 +42,7 @@ function GameScreen({
   const [showGroups, setShowGroups] = useState(false);
   const [showGroupLeaderboard, setShowGroupLeaderboard] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [showProfile, setShowProfile] = useState(false);
   const [modeToast, setModeToast] = useState('');
   const gameResultSavedRef = useRef(false);
 
@@ -119,7 +123,7 @@ function GameScreen({
         onToggleTheme={toggleTheme}
         onStats={() => game.setShowStats(true)}
         onHistory={() => setShowHistory(true)}
-        onLogin={() => setShowLogin(true)}
+        onLogin={() => isAuthenticated ? setShowProfile(true) : setShowLogin(true)}
         onGroups={() => setShowGroups(true)}
         onToggleGameMode={() => {
           const next = gameMode === 'daily' ? 'practice' : 'daily';
@@ -179,6 +183,15 @@ function GameScreen({
         }}
         groupId={selectedGroupId || ''}
         letterMode={letterMode}
+      />
+      <ProfileModal
+        visible={showProfile}
+        onClose={() => setShowProfile(false)}
+        onLogout={async () => {
+          await signOut();
+          setShowProfile(false);
+          window.location.reload();
+        }}
       />
     </div>
   );

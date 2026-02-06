@@ -1,5 +1,4 @@
 import { HelpCircle, Trophy } from 'lucide-react';
-import { UserMenu } from './UserMenu';
 
 interface Props {
   onHelp: () => void;
@@ -30,9 +29,7 @@ export default function Header({ onHelp, onLeaderboard }: Props) {
         alt="Letreco" 
         className="h-10 sm:h-12 md:h-14 max-w-[40vw] object-contain select-none" 
       />
-      <div className="flex-shrink-0">
-        <UserMenu />
-      </div>
+      <div className="w-10 flex-shrink-0" /> {/* Spacer for balance */}
     </header>
   );
 }
