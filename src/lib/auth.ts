@@ -113,7 +113,7 @@ export async function ensurePlayer(): Promise<string | null> {
     const { data: existing } = await supabase
       .from('players')
       .select('id, display_name')
-      .eq('user_id', user.id)
+      .eq('auth_user_id', user.id)
       .single();
 
     if (existing) {
@@ -128,7 +128,7 @@ export async function ensurePlayer(): Promise<string | null> {
       .from('players')
       .select('id, display_name')
       .eq('anonymous_id', anonId)
-      .is('user_id', null)
+      .is('auth_user_id', null)
       .single();
 
     if (anonPlayer) {
@@ -137,7 +137,7 @@ export async function ensurePlayer(): Promise<string | null> {
       await supabase
         .from('players')
         .update({ 
-          user_id: user.id, 
+          auth_user_id: user.id, 
           display_name: displayName,
           email: user.email,
           avatar_url: user.user_metadata?.avatar_url || null,
@@ -154,7 +154,7 @@ export async function ensurePlayer(): Promise<string | null> {
     const { data: created, error } = await supabase
       .from('players')
       .insert({ 
-        user_id: user.id,
+        auth_user_id: user.id,
         anonymous_id: anonId,
         display_name: displayName,
         email: user.email,
@@ -280,7 +280,7 @@ export async function saveGameResult(params: {
   if (!playerId) return;
 
   try {
-    await supabase.from('game_results').insert({
+    const { error } = await supabase.from('game_results').insert({
       player_id: playerId,
       letter_mode: params.letterMode,
       game_mode: params.gameMode,
@@ -290,8 +290,13 @@ export async function saveGameResult(params: {
       board: params.board,
       daily_date: params.dailyDate || null,
     });
+    if (error) {
+      console.error('Failed to save game result:', error);
+    } else {
+      console.log('Game result saved successfully for player:', playerId);
+    }
   } catch (e) {
-    console.error('Failed to save game result:', e);
+    console.error('Failed to save game result (exception):', e);
   }
 }
 
